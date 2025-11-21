@@ -85,7 +85,7 @@ public class MateriaController {
 
     /**
      * DELETE /api/materias/{id}
-     * Eliminar (desactivar) una materia (solo admin)
+     * Eliminar una materia (solo admin)
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {

@@ -76,7 +76,7 @@ public class MateriaService {
     }
 
     /**
-     * Eliminar materia (desactivar - solo admin)
+     * Eliminar materia (solo admin)
      */
     public void eliminar(Long id) {
         Materia materia = materiaRepository.findById(id)
