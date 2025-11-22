@@ -74,6 +74,15 @@ public class RecursoService {
     }
 
     /**
+     * Listar TODOS los recursos (activos e inactivos) - Solo admin
+     */
+    public List<RecursoDTO> listarTodos() {
+        return recursoRepository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Listar recursos por materia
      */
     public List<RecursoDTO> listarPorMateria(Long materiaId) {
@@ -124,6 +133,13 @@ public class RecursoService {
         // Marcar como inactivo en BD
         recurso.setActivo(false);
         recursoRepository.save(recurso);
+    }
+    public RecursoDTO reactivar(Long id) {
+        Recurso recurso = recursoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
+        recurso.setActivo(true);
+        Recurso reactivado = recursoRepository.save(recurso);
+        return convertirADTO(reactivado);
     }
 
     /**

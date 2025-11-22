@@ -25,8 +25,9 @@ public class RecursoController {
      * POST /api/recursos/subir
      * Subir un nuevo recurso (docente o admin)
      * Se envía como multipart/form-data
+     * NOTA: Usar Postman o CURL para probar, Swagger tiene problemas con multipart
      */
-    @PostMapping("/subir")
+    @PostMapping(value = "/subir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> subirRecurso(
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
@@ -52,6 +53,16 @@ public class RecursoController {
     @GetMapping
     public ResponseEntity<List<RecursoDTO>> listarActivos() {
         List<RecursoDTO> recursos = recursoService.listarActivos();
+        return ResponseEntity.ok(recursos);
+    }
+
+    /**
+     * GET /api/recursos/todos
+     * Listar TODOS los recursos (activos e inactivos) - Solo admin
+     */
+    @GetMapping("/todos")
+    public ResponseEntity<List<RecursoDTO>> listarTodos() {
+        List<RecursoDTO> recursos = recursoService.listarTodos();
         return ResponseEntity.ok(recursos);
     }
 
@@ -117,4 +128,16 @@ public class RecursoController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+    @PutMapping("/{id}/reactivar")
+    public ResponseEntity<?> reactivar(@PathVariable Long id) {
+        try {
+            RecursoDTO recurso = recursoService.reactivar(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Recurso reactivado", "recurso", recurso));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+
 }
