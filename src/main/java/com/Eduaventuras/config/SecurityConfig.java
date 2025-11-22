@@ -1,44 +1,55 @@
 package com.Eduaventuras.config;
 
+import com.Eduaventuras.security.JwtFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Configuración de seguridad
- * Por ahora, deshabilitamos la autenticación para desarrollo
- * Más adelante agregaremos JWT
+ * Configuración de seguridad con JWT
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso público a estos endpoints
+                        // Endpoints públicos (sin autenticación)
                         .requestMatchers(
                                 "/api/usuarios/registro",
                                 "/api/usuarios/login",
+                                "/api/materias",
                                 "/api/materias/**",
-                                "/api/recursos/**",
+                                "/api/recursos",
+                                "/api/recursos/materia/**",
+                                "/api/recursos/{id}",
+                                "/api/recursos/{id}/descargar",
+                                "/api/estadisticas/resumen",
+                                "/api/idioma/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/api-docs/**"
                         ).permitAll()
-                        // Todos los demás requieren autenticación (cuando implementemos JWT)
-                        .anyRequest().permitAll() // Por ahora permitimos todo para desarrollo
+                        // Todos los demás endpoints requieren autenticación
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin sesiones (usaremos JWT)
-                );
-
-        return http.build();
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin sesiones
+                )
+                // Agregar filtro JWT antes del filtro de autenticación estándar
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }

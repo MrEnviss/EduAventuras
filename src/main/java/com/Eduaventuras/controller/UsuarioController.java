@@ -23,6 +23,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private com.Eduaventuras.security.JwtUtil jwtUtil;
+
     /**
      * POST /api/usuarios/registro
      * Registrar un nuevo usuario
@@ -31,9 +34,15 @@ public class UsuarioController {
     public ResponseEntity<?> registrar(@Valid @RequestBody RegistroDTO registroDTO) {
         try {
             UsuarioDTO usuario = usuarioService.registrar(registroDTO);
+
+            // Generar token JWT automáticamente después del registro
+            String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
+
             Map<String, Object> response = new HashMap<>();
             response.put("mensaje", "Usuario registrado exitosamente");
             response.put("usuario", usuario);
+            response.put("token", token);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -42,16 +51,21 @@ public class UsuarioController {
 
     /**
      * POST /api/usuarios/login
-     * Iniciar sesión
+     * Iniciar sesión - Devuelve token JWT
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
         try {
             UsuarioDTO usuario = usuarioService.login(loginDTO);
+
+            // Generar token JWT
+            String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
+
             Map<String, Object> response = new HashMap<>();
             response.put("mensaje", "Login exitoso");
             response.put("usuario", usuario);
-            // TODO: Aquí agregaremos el JWT token después
+            response.put("token", token);
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

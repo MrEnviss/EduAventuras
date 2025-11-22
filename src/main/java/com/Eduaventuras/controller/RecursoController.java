@@ -28,18 +28,24 @@ public class RecursoController {
     /**
      * POST /api/recursos/subir
      * Subir un nuevo recurso (docente o admin)
-     * Se envía como multipart/form-data
-     * NOTA: Usar Postman o CURL para probar, Swagger tiene problemas con multipart
+     * El usuario se obtiene automáticamente del token JWT
      */
     @PostMapping(value = "/subir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> subirRecurso(
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
-            @RequestParam("materiaId") Long materiaId,
-            @RequestParam("usuarioId") Long usuarioId) {
+            @RequestParam("materiaId") Long materiaId) {
 
         try {
+            // Obtener usuario autenticado del token JWT
+            Long usuarioId = com.Eduaventuras.util.AuthUtil.obtenerUsuarioId();
+
+            if (usuarioId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "No estás autenticado. Inicia sesión primero."));
+            }
+
             RecursoDTO recurso = recursoService.subirRecurso(file, titulo, descripcion,
                     materiaId, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED)
