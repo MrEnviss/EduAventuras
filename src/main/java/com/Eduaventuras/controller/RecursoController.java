@@ -2,6 +2,7 @@ package com.Eduaventuras.controller;
 
 import com.Eduaventuras.dto.RecursoDTO;
 import com.Eduaventuras.service.RecursoService;
+import com.Eduaventuras.service.DescargaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ public class RecursoController {
 
     @Autowired
     private RecursoService recursoService;
+
+    @Autowired
+    private DescargaService descargaService;
 
     /**
      * POST /api/recursos/subir
@@ -93,10 +97,18 @@ public class RecursoController {
     /**
      * GET /api/recursos/{id}/descargar
      * Descargar un recurso (archivo PDF)
+     * Registra automáticamente la descarga para estadísticas si se proporciona usuarioId
      */
     @GetMapping("/{id}/descargar")
-    public ResponseEntity<?> descargar(@PathVariable Long id) {
+    public ResponseEntity<?> descargar(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long usuarioId) {
         try {
+            // Registrar la descarga si se proporcionó usuarioId
+            if (usuarioId != null) {
+                descargaService.registrarDescarga(id, usuarioId);
+            }
+
             byte[] archivo = recursoService.descargarRecurso(id);
             String nombreArchivo = recursoService.obtenerNombreArchivo(id);
 
@@ -117,6 +129,7 @@ public class RecursoController {
     /**
      * DELETE /api/recursos/{id}
      * Eliminar un recurso (admin o quien lo subió)
+     * NOTA: Esto es "soft delete", solo marca como inactivo
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
@@ -128,16 +141,19 @@ public class RecursoController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-    @PutMapping("/{id}/reactivar")
-    public ResponseEntity<?> reactivar(@PathVariable Long id) {
+
+    /**
+     * PUT /api/recursos/{id}/restaurar
+     * Restaurar un recurso eliminado (solo admin)
+     */
+    @PutMapping("/{id}/restaurar")
+    public ResponseEntity<?> restaurar(@PathVariable Long id) {
         try {
             RecursoDTO recurso = recursoService.reactivar(id);
-            return ResponseEntity.ok(Map.of("mensaje", "Recurso reactivado", "recurso", recurso));
+            return ResponseEntity.ok(Map.of("mensaje", "Recurso restaurado exitosamente", "recurso", recurso));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         }
     }
-
-
-
 }
