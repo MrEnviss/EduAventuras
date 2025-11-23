@@ -134,12 +134,35 @@ public class RecursoService {
         recurso.setActivo(false);
         recursoRepository.save(recurso);
     }
+
+    /**
+     * Reactivar recurso eliminado (solo admin)
+     */
     public RecursoDTO reactivar(Long id) {
         Recurso recurso = recursoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
         recurso.setActivo(true);
         Recurso reactivado = recursoRepository.save(recurso);
         return convertirADTO(reactivado);
+    }
+
+    /**
+     * Contar recursos activos (para dashboard)
+     */
+    public long contarRecursosActivos() {
+        return recursoRepository.findByActivo(true).size();
+    }
+
+    /**
+     * Obtener recursos recientes (para dashboard)
+     */
+    public List<RecursoDTO> obtenerRecursosRecientes(int limite) {
+        return recursoRepository.findAll().stream()
+                .filter(Recurso::getActivo)
+                .sorted((r1, r2) -> r2.getFechaSubida().compareTo(r1.getFechaSubida()))
+                .limit(limite)
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
 
     /**

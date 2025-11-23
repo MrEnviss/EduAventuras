@@ -93,6 +93,13 @@ public class MateriaService {
     }
 
     /**
+     * Contar materias activas (para dashboard)
+     */
+    public long contarMateriasActivas() {
+        return materiaRepository.findByActivo(true).size();
+    }
+
+    /**
      * Convertir entidad a DTO
      */
     private MateriaDTO convertirADTO(Materia materia) {

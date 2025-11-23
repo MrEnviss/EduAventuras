@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class DescargaService {
@@ -69,5 +72,58 @@ public class DescargaService {
      */
     public long contarTotalDescargas() {
         return descargaRepository.count();
+    }
+
+    /**
+     * Obtener recursos más descargados (para dashboard)
+     * Retorna un mapa con recursoId, titulo y cantidad de descargas
+     */
+    public List<Map<String, Object>> obtenerRecursosMasDescargados(int limite) {
+        List<Descarga> todasLasDescargas = descargaRepository.findAll();
+
+        // Agrupar descargas por recurso y contar
+        Map<Long, Long> conteoPorRecurso = todasLasDescargas.stream()
+                .collect(Collectors.groupingBy(
+                        d -> d.getRecurso().getId(),
+                        Collectors.counting()
+                ));
+
+        // Ordenar por cantidad de descargas y tomar los primeros N
+        return conteoPorRecurso.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(limite)
+                .map(entry -> {
+                    Recurso recurso = recursoRepository.findById(entry.getKey())
+                            .orElse(null);
+
+                    Map<String, Object> info = new HashMap<>();
+                    if (recurso != null) {
+                        info.put("recursoId", recurso.getId());
+                        info.put("titulo", recurso.getTitulo());
+                        info.put("materia", recurso.getMateria().getNombre());
+                        info.put("cantidadDescargas", entry.getValue());
+                    }
+                    return info;
+                })
+                .filter(m -> !m.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtener descargas recientes (para dashboard)
+     */
+    public List<Map<String, Object>> obtenerDescargasRecientes(int limite) {
+        return descargaRepository.findAll().stream()
+                .sorted((d1, d2) -> d2.getFechaDescarga().compareTo(d1.getFechaDescarga()))
+                .limit(limite)
+                .map(descarga -> {
+                    Map<String, Object> info = new HashMap<>();
+                    info.put("recursoTitulo", descarga.getRecurso().getTitulo());
+                    info.put("usuarioNombre", descarga.getUsuario().getNombre() + " " +
+                            descarga.getUsuario().getApellido());
+                    info.put("fecha", descarga.getFechaDescarga());
+                    return info;
+                })
+                .collect(Collectors.toList());
     }
 }

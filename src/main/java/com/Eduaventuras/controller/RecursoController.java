@@ -35,17 +35,11 @@ public class RecursoController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
-            @RequestParam("materiaId") Long materiaId) {
+            @RequestParam("materiaId") Long materiaId,
+            @RequestParam("usuarioId") Long usuarioId) {  // ← VOLVER A RECIBIR POR PARÁMETRO
 
         try {
-            // Obtener usuario autenticado del token JWT
-            Long usuarioId = com.Eduaventuras.util.AuthUtil.obtenerUsuarioId();
-
-            if (usuarioId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "No estás autenticado. Inicia sesión primero."));
-            }
-
+            // YA NO USAR AuthUtil, usar el parámetro directo
             RecursoDTO recurso = recursoService.subirRecurso(file, titulo, descripcion,
                     materiaId, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED)
