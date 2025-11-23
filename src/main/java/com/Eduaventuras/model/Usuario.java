@@ -39,6 +39,9 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @Column(name = "foto_perfil", length = 255)
+    private String fotoPerfil;
+
     @PrePersist
     protected void onCreate() {
         fechaRegistro = LocalDateTime.now();

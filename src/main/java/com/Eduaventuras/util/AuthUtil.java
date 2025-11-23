@@ -1,51 +1,93 @@
 package com.Eduaventuras.util;
 
-import com.Eduaventuras.model.Usuario;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.Eduaventuras.security.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * Utilidad para obtener el usuario autenticado desde el token JWT
+ * Utilidad para obtener informacion del usuario autenticado desde el token JWT
  */
+@Component
 public class AuthUtil {
 
-    /**
-     * Obtener el usuario autenticado actualmente
-     * @return Usuario autenticado o null si no hay autenticación
-     */
-    public static Usuario obtenerUsuarioAutenticado() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @Autowired
+    private JwtUtil jwtUtil;
 
-        if (authentication != null && authentication.getPrincipal() instanceof Usuario) {
-            return (Usuario) authentication.getPrincipal();
+    /**
+     * Obtener el email del usuario logueado desde el token JWT
+     */
+    public String obtenerEmailDelToken() {
+        try {
+            HttpServletRequest request = obtenerRequest();
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                return jwtUtil.obtenerEmailDelToken(token);
+            }
+
+            throw new RuntimeException("Token no encontrado");
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener email del token: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Obtener el rol del usuario logueado desde el token JWT
+     */
+    public String obtenerRolDelToken() {
+        try {
+            HttpServletRequest request = obtenerRequest();
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                return jwtUtil.obtenerRolDelToken(token);
+            }
+
+            throw new RuntimeException("Token no encontrado");
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener rol del token: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Verificar si el usuario tiene un rol especifico
+     */
+    public boolean tieneRol(String rolRequerido) {
+        String rolActual = obtenerRolDelToken();
+        return rolActual.equals(rolRequerido);
+    }
+
+    /**
+     * Verificar si el usuario es ADMIN
+     */
+    public boolean esAdmin() {
+        return tieneRol("ADMIN");
+    }
+
+    /**
+     * Verificar si el usuario es DOCENTE o ADMIN
+     */
+    public boolean esDocenteOAdmin() {
+        String rol = obtenerRolDelToken();
+        return rol.equals("DOCENTE") || rol.equals("ADMIN");
+    }
+
+    /**
+     * Obtener el request actual
+     */
+    private HttpServletRequest obtenerRequest() {
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if (attributes == null) {
+            throw new RuntimeException("No hay request en el contexto");
         }
 
-        return null;
-    }
-
-    /**
-     * Obtener el ID del usuario autenticado
-     * @return ID del usuario o null si no está autenticado
-     */
-    public static Long obtenerUsuarioId() {
-        Usuario usuario = obtenerUsuarioAutenticado();
-        return usuario != null ? usuario.getId() : null;
-    }
-
-    /**
-     * Obtener el email del usuario autenticado
-     * @return Email del usuario o null si no está autenticado
-     */
-    public static String obtenerUsuarioEmail() {
-        Usuario usuario = obtenerUsuarioAutenticado();
-        return usuario != null ? usuario.getEmail() : null;
-    }
-
-    /**
-     * Verificar si hay un usuario autenticado
-     * @return true si hay usuario autenticado, false si no
-     */
-    public static boolean estaAutenticado() {
-        return obtenerUsuarioAutenticado() != null;
+        return attributes.getRequest();
     }
 }

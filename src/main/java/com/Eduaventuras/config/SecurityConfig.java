@@ -3,6 +3,7 @@ package com.Eduaventuras.config;
 import com.Eduaventuras.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,7 +27,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // ==========================================
-                        // RUTAS COMPLETAMENTE PÚBLICAS (sin token)
+                        // RUTAS COMPLETAMENTE PUBLICAS (sin token)
                         // ==========================================
                         .requestMatchers(
                                 // Swagger UI
@@ -37,58 +38,58 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/api-docs/**",
 
-                                // Autenticación
+                                // Autenticacion
                                 "/api/usuarios/registro",
                                 "/api/usuarios/login",
 
-                                // Gestión de contraseñas
+                                // Gestion de contraseñas
                                 "/api/password/**",
 
-                                // Materias (lectura pública)
-                                "/api/materias",
-                                "/api/materias/{id}",
-                                "/api/materias/todas",
-
-                                // Recursos (lectura y descarga pública)
-                                "/api/recursos",
-                                "/api/recursos/{id}",
-                                "/api/recursos/todos",
-                                "/api/recursos/materia/{materiaId}",
-                                "/api/recursos/{id}/descargar",
-
-                                // Reportes (públicos)
-                                "/api/reportes/**",
-
-                                // Estadísticas generales (públicas)
-                                "/api/estadisticas/resumen",
-
-                                // Internacionalización
-                                "/api/idioma/**"
+                                // Fotos de perfil (lectura publica)
+                                "/api/perfil/foto/{usuarioId}"
                         ).permitAll()
 
+                        // Materias - Solo lectura publica
+                        .requestMatchers(HttpMethod.GET, "/api/materias", "/api/materias/**").permitAll()
+
+                        // Recursos - Solo lectura y descarga publica
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/recursos",
+                                "/api/recursos/**"
+                        ).permitAll()
+
+                        // Reportes - Publicos
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/**").permitAll()
+
+                        // Estadisticas generales - Publicas
+                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/resumen").permitAll()
+
+                        // Internacionalizacion - Publico
+                        .requestMatchers("/api/idioma/**").permitAll()
+
                         // ==========================================
-                        // RUTAS PROTEGIDAS (requieren token JWT)
+                        // RUTAS PROTEGIDAS CON AUTENTICACION
                         // ==========================================
 
-                        // Dashboard de administrador (solo ADMIN)
-                        .requestMatchers("/api/admin/**").authenticated()
+                        // Perfil - Cualquier usuario autenticado
+                        .requestMatchers("/api/perfil", "/api/perfil/**").authenticated()
 
-                        // Gestión de usuarios (autenticados)
-                        .requestMatchers(
-                                "/api/usuarios",          // Listar usuarios
-                                "/api/usuarios/{id}",     // Ver usuario específico
-                                "/api/usuarios/rol/{rol}", // Usuarios por rol
-                                "/api/usuarios/estadisticas" // Estadísticas de usuarios
-                        ).authenticated()
+                        // Dashboard - Solo ADMIN
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-                        // Operaciones de creación/modificación (autenticados)
-                        .requestMatchers(
-                                "/api/materias",          // POST (crear materia)
-                                "/api/materias/{id}",     // PUT/DELETE (modificar/eliminar)
-                                "/api/recursos/subir"     // POST (subir recurso)
-                        ).authenticated()
+                        // Gestion de usuarios - Solo ADMIN
+                        .requestMatchers("/api/usuarios", "/api/usuarios/**").hasAuthority("ADMIN")
 
-                        // Cualquier otra ruta requiere autenticación
+                        // Materias - Crear/Editar/Eliminar solo ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/materias").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasAuthority("ADMIN")
+
+                        // Recursos - Subir: DOCENTE o ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyAuthority("DOCENTE", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyAuthority("DOCENTE", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasAuthority("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
