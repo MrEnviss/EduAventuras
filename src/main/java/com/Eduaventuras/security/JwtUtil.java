@@ -3,25 +3,35 @@ package com.Eduaventuras.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Utilidad para generar y validar tokens JWT
- * NOTA: Por ahora está creado pero no se usa (para futuras implementaciones)
  */
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:EduAventuras2024SecretKeySuperSeguraParaJWT}")
+    @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration:86400000}") // 24 horas en milisegundos
     private Long expiration;
+
+    /**
+     * Obtener la clave segura desde el secret
+     */
+    private Key getSigningKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     /**
      * Generar token JWT para un usuario
@@ -35,7 +45,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -43,8 +53,12 @@ public class JwtUtil {
      * Validar token JWT
      */
     public Boolean validarToken(String token, String email) {
-        final String emailFromToken = obtenerEmailDelToken(token);
-        return (emailFromToken.equals(email) && !esTokenExpirado(token));
+        try {
+            final String emailFromToken = obtenerEmailDelToken(token);
+            return (emailFromToken.equals(email) && !esTokenExpirado(token));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -73,8 +87,9 @@ public class JwtUtil {
      * Obtener claims del token
      */
     private Claims obtenerClaimsDelToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }

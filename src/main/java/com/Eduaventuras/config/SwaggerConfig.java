@@ -13,14 +13,12 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    public OpenAPI eduAventurasOpenAPI() {
+    public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("EduAventuras API")
-                        .description("API REST para plataforma educativa gratuita")
-                        .version("1.0.0")
-                        .contact(new Contact()
-                                .name("EduAventuras Team")
-                                .email("info@eduaventuras.com")));
+                        .title("API EduAventuras")
+                        .description("API REST documentada con Swagger/OpenAPI")
+                        .version("1.0.0"));
     }
 }
+
