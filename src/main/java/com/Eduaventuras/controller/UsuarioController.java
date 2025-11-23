@@ -36,7 +36,7 @@ public class UsuarioController {
             UsuarioDTO usuario = usuarioService.registrar(registroDTO);
 
             // Generar token JWT automáticamente después del registro
-            String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
+            String token= jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
 
             Map<String, Object> response = new HashMap<>();
             response.put("mensaje", "Usuario registrado exitosamente");
@@ -58,13 +58,13 @@ public class UsuarioController {
         try {
             UsuarioDTO usuario = usuarioService.login(loginDTO);
 
-            // Generar token JWT
-            String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
+            // COMENTAR JWT TEMPORALMENTE
+              String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().toString());
 
             Map<String, Object> response = new HashMap<>();
             response.put("mensaje", "Login exitoso");
             response.put("usuario", usuario);
-            response.put("token", token);
+             response.put("token", token);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -72,6 +72,7 @@ public class UsuarioController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
 
     /**
      * GET /api/usuarios

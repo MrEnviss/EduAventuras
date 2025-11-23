@@ -1,7 +1,6 @@
 package com.Eduaventuras.config;
 
 import com.Eduaventuras.security.JwtFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,45 +9,88 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración de seguridad con JWT
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos (sin autenticación)
+                        // ==========================================
+                        // RUTAS COMPLETAMENTE PÚBLICAS (sin token)
+                        // ==========================================
                         .requestMatchers(
-                                "/api/usuarios/registro",
-                                "/api/usuarios/login",
-                                "/api/materias",
-                                "/api/materias/**",
-                                "/api/recursos",
-                                "/api/recursos/materia/**",
-                                "/api/recursos/{id}",
-                                "/api/recursos/{id}/descargar",
-                                "/api/estadisticas/resumen",
-                                "/api/idioma/**",
+                                // Swagger UI
+                                "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/api-docs/**"
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/api-docs/**",
+
+                                // Autenticación
+                                "/api/usuarios/registro",
+                                "/api/usuarios/login",
+
+                                // Gestión de contraseñas
+                                "/api/password/**",
+
+                                // Materias (lectura pública)
+                                "/api/materias",
+                                "/api/materias/{id}",
+                                "/api/materias/todas",
+
+                                // Recursos (lectura y descarga pública)
+                                "/api/recursos",
+                                "/api/recursos/{id}",
+                                "/api/recursos/todos",
+                                "/api/recursos/materia/{materiaId}",
+                                "/api/recursos/{id}/descargar",
+
+                                // Reportes (públicos)
+                                "/api/reportes/**",
+
+                                // Estadísticas generales (públicas)
+                                "/api/estadisticas/resumen",
+
+                                // Internacionalización
+                                "/api/idioma/**"
                         ).permitAll()
-                        // Todos los demás endpoints requieren autenticación
+
+                        // ==========================================
+                        // RUTAS PROTEGIDAS (requieren token JWT)
+                        // ==========================================
+
+                        // Dashboard de administrador (solo ADMIN)
+                        .requestMatchers("/api/admin/**").authenticated()
+
+                        // Gestión de usuarios (autenticados)
+                        .requestMatchers(
+                                "/api/usuarios",          // Listar usuarios
+                                "/api/usuarios/{id}",     // Ver usuario específico
+                                "/api/usuarios/rol/{rol}", // Usuarios por rol
+                                "/api/usuarios/estadisticas" // Estadísticas de usuarios
+                        ).authenticated()
+
+                        // Operaciones de creación/modificación (autenticados)
+                        .requestMatchers(
+                                "/api/materias",          // POST (crear materia)
+                                "/api/materias/{id}",     // PUT/DELETE (modificar/eliminar)
+                                "/api/recursos/subir"     // POST (subir recurso)
+                        ).authenticated()
+
+                        // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sin sesiones
-                )
-                // Agregar filtro JWT antes del filtro de autenticación estándar
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -10,6 +10,10 @@ import com.Eduaventuras.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +21,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    // Almacenamiento temporal de tokens de recuperación (en producción usar Redis o BD)
+    private Map<String, TokenRecuperacion> tokensRecuperacion = new HashMap<>();
 
     /**
      * Registrar un nuevo usuario
@@ -56,6 +63,82 @@ public class UsuarioService {
         }
 
         return convertirADTO(usuario);
+    }
+
+    /**
+     * Cambiar contraseña (usuario logueado)
+     */
+    public void cambiarPassword(String email, String passwordActual, String passwordNueva) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar que la contraseña actual sea correcta
+        if (!PasswordUtil.verificar(passwordActual, usuario.getPassword())) {
+            throw new RuntimeException("La contraseña actual es incorrecta");
+        }
+
+        // Actualizar contraseña
+        usuario.setPassword(PasswordUtil.encriptar(passwordNueva));
+        usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Verificar si un email existe (para recuperación de contraseña)
+     */
+    public void verificarEmailExiste(String email) {
+        usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email no encontrado"));
+    }
+
+    /**
+     * Generar token de recuperación de contraseña
+     */
+    public String generarTokenRecuperacion(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email no encontrado"));
+
+        // Generar token único
+        String token = UUID.randomUUID().toString();
+
+        // Guardar token con fecha de expiración (1 hora)
+        TokenRecuperacion tokenRecuperacion = new TokenRecuperacion();
+        tokenRecuperacion.setEmail(email);
+        tokenRecuperacion.setToken(token);
+        tokenRecuperacion.setFechaExpiracion(LocalDateTime.now().plusHours(1));
+
+        tokensRecuperacion.put(token, tokenRecuperacion);
+
+        // TODO: En producción, enviar email con el token
+        // EmailService.enviarEmailRecuperacion(email, token);
+
+        return token;
+    }
+
+    /**
+     * Restablecer contraseña con token de recuperación
+     */
+    public void restablecerPasswordConToken(String token, String nuevaPassword) {
+        TokenRecuperacion tokenRecuperacion = tokensRecuperacion.get(token);
+
+        if (tokenRecuperacion == null) {
+            throw new RuntimeException("Token inválido o expirado");
+        }
+
+        // Verificar que el token no haya expirado
+        if (LocalDateTime.now().isAfter(tokenRecuperacion.getFechaExpiracion())) {
+            tokensRecuperacion.remove(token);
+            throw new RuntimeException("Token expirado");
+        }
+
+        // Buscar usuario y actualizar contraseña
+        Usuario usuario = usuarioRepository.findByEmail(tokenRecuperacion.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setPassword(PasswordUtil.encriptar(nuevaPassword));
+        usuarioRepository.save(usuario);
+
+        // Eliminar token usado
+        tokensRecuperacion.remove(token);
     }
 
     /**
@@ -103,6 +186,24 @@ public class UsuarioService {
     }
 
     /**
+     * Contar todos los usuarios (para dashboard)
+     */
+    public long contarTodosLosUsuarios() {
+        return usuarioRepository.count();
+    }
+
+    /**
+     * Obtener usuarios recientes (para dashboard)
+     */
+    public List<UsuarioDTO> obtenerUsuariosRecientes(int limite) {
+        return usuarioRepository.findAll().stream()
+                .sorted((u1, u2) -> u2.getFechaRegistro().compareTo(u1.getFechaRegistro()))
+                .limit(limite)
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Convertir entidad a DTO
      */
     private UsuarioDTO convertirADTO(Usuario usuario) {
@@ -115,5 +216,23 @@ public class UsuarioService {
         dto.setFechaRegistro(usuario.getFechaRegistro());
         dto.setActivo(usuario.getActivo());
         return dto;
+    }
+
+    /**
+     * Clase interna para tokens de recuperación
+     */
+    private static class TokenRecuperacion {
+        private String email;
+        private String token;
+        private LocalDateTime fechaExpiracion;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getToken() { return token; }
+        public void setToken(String token) { this.token = token; }
+        public LocalDateTime getFechaExpiracion() { return fechaExpiracion; }
+        public void setFechaExpiracion(LocalDateTime fechaExpiracion) {
+            this.fechaExpiracion = fechaExpiracion;
+        }
     }
 }
