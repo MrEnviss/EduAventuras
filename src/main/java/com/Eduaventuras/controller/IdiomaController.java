@@ -35,7 +35,8 @@ public class IdiomaController {
     public ResponseEntity<Map<String, String>> obtenerIdiomasDisponibles() {
         Map<String, String> idiomas = Map.of(
                 "es", "Español",
-                "en", "English"
+                "en", "English",
+                "fr", "Frances"
         );
         return ResponseEntity.ok(idiomas);
     }

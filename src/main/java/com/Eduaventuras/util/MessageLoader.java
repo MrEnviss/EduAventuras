@@ -18,7 +18,7 @@ public class MessageLoader {
         Map<String, String> mensajes = new HashMap<>();
 
         // Validar idioma (solo español e inglés soportados)
-        if (!idioma.equals("es") && !idioma.equals("en")) {
+        if (!idioma.equals("es") && !idioma.equals("en") && !idioma.equals("fr")) {
             idioma = "es"; // Por defecto español
         }
 
