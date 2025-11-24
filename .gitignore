@@ -1,48 +1,51 @@
- Compiled class files
-*.class
-target/
+# Archivos y directorios generados por Maven
+/target/
+/out/
 
-# Log files
+# Archivos generados por compilación y ejecución
 *.log
-
-# Package Files
+*.class
 *.jar
 *.war
-*.nar
 *.ear
-*.zip
-*.tar.gz
-*.rar
 
-# Maven
-.mvn/
-mvnw
-mvnw.cmd
-
-# IntelliJ IDEA
+# Configuración específica del IDE (IntelliJ, Eclipse, VSCode, etc.)
 .idea/
 *.iml
-*.iws
 *.ipr
-out/
-
-# Eclipse
-.classpath
+*.iws
 .project
+.classpath
 .settings/
-
-# VS Code
 .vscode/
 
-# Application properties con datos sensibles
-# application-prod.properties
-
-# Carpeta de uploads (archivos subidos por usuarios)
-uploads/
-
-# OS Files
+# Configuración y caches específicos del sistema operativo
 .DS_Store
 Thumbs.db
 
-# Spring Boot
-HELP.md
+# Dependencias locales de Maven descargadas
+.m2/
+*/.mvn/timing.properties
+
+# Archivos de configuración sensibles y relacionados al entorno
+/application.properties
+/application.yml
+/application-*.properties
+/local.env
+
+# Archivos de uploads o almacenamiento local
+/uploads/
+*.db
+*.sqlite
+
+# Archivos de la herramienta Swagger que se generan en tiempo de ejecución
+/v3/api-docs/
+swagger-ui/
+
+# Archivos de rendimiento específico de Java
+hs_err_pid*.log
+*.hprof
+
+# Archivos de pruebas temporales
+/test-output/
+*.out
