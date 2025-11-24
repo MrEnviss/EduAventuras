@@ -1,5 +1,7 @@
 package com.Eduaventuras.service;
 
+
+import com.Eduaventuras.dto.ActualizarPerfilDTO;
 import com.Eduaventuras.dto.LoginDTO;
 import com.Eduaventuras.dto.RegistroDTO;
 import com.Eduaventuras.dto.UsuarioDTO;
@@ -9,12 +11,14 @@ import com.Eduaventuras.repository.UsuarioRepository;
 import com.Eduaventuras.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service
 public class UsuarioService {
@@ -24,6 +28,109 @@ public class UsuarioService {
 
     // Almacenamiento temporal de tokens de recuperación (en producción usar Redis o BD)
     private Map<String, TokenRecuperacion> tokensRecuperacion = new HashMap<>();
+    /**
+     * Buscar usuario por email
+     */
+    public UsuarioDTO buscarPorEmail(String email) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        return convertirADTO(usuario);
+    }
+
+    /**
+     * Actualizar perfil (nombre y apellido)
+     */
+    public UsuarioDTO actualizarPerfil(String email, ActualizarPerfilDTO dto) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        usuario.setNombre(dto.getNombre());
+        usuario.setApellido(dto.getApellido());
+        usuarioRepository.save(usuario);
+
+        return convertirADTO(usuario);
+    }
+
+    /**
+     * Subir foto de perfil
+     */
+    public String subirFotoPerfil(String email, MultipartFile foto) throws IOException {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        // Crear directorio uploads si no existe
+        String rutaDirectorio = "uploads/";
+        File directorio = new File(rutaDirectorio);
+        if (!directorio.exists()) {
+            directorio.mkdirs();
+        }
+
+        String nombreArchivo = email + "_" + foto.getOriginalFilename();
+        String rutaCompleta = rutaDirectorio + nombreArchivo;
+
+        File archivo = new File(rutaCompleta);
+        foto.transferTo(archivo);
+
+        usuario.setFotoPerfil(rutaCompleta);
+        usuarioRepository.save(usuario);
+
+        return usuario.getFotoPerfil();
+    }
+
+    /**
+     * Obtener foto de perfil (como byte[])
+     */
+    public byte[] obtenerFotoPerfil(Long usuarioId) throws IOException {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado con el ID: " + usuarioId);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.getFotoPerfil() == null) {
+            throw new IllegalArgumentException("El usuario no tiene una foto de perfil");
+        }
+
+        File archivo = new File(usuario.getFotoPerfil());
+        if (!archivo.exists()) {
+            throw new IllegalArgumentException("No se encontró la foto de perfil");
+        }
+
+        return java.nio.file.Files.readAllBytes(archivo.toPath());
+    }
+
+    /**
+     * Eliminar foto de perfil
+     */
+    public void eliminarFotoPerfil(String email) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.getFotoPerfil() != null) {
+            File archivo = new File(usuario.getFotoPerfil());
+            if (archivo.exists()) {
+                archivo.delete();
+            }
+            usuario.setFotoPerfil(null);
+            usuarioRepository.save(usuario);
+        } else {
+            throw new IllegalArgumentException("El usuario no tiene una foto de perfil para eliminar");
+        }
+    }
 
     /**
      * Registrar un nuevo usuario
@@ -77,7 +184,6 @@ public class UsuarioService {
             throw new RuntimeException("La contraseña actual es incorrecta");
         }
 
-        // Actualizar contraseña
         usuario.setPassword(PasswordUtil.encriptar(passwordNueva));
         usuarioRepository.save(usuario);
     }
@@ -108,8 +214,7 @@ public class UsuarioService {
 
         tokensRecuperacion.put(token, tokenRecuperacion);
 
-        // TODO: En producción, enviar email con el token
-        // EmailService.enviarEmailRecuperacion(email, token);
+        
 
         return token;
     }

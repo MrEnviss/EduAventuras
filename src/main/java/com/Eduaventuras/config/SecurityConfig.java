@@ -36,33 +36,32 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api-docs/**",
-
-                                // Autenticacion
-                                "/api/usuarios/registro",
-                                "/api/usuarios/login",
-
-                                // Gestion de contraseñas
-                                "/api/password/**",
-
-                                // Fotos de perfil (lectura publica)
-                                "/api/perfil/foto/{usuarioId}"
+                                "/api-docs/**"
                         ).permitAll()
+
+                        // Autenticacion
+                        .requestMatchers(
+                                "/api/usuarios/registro",
+                                "/api/usuarios/login"
+                        ).permitAll()
+
+                        // Gestion de contraseñas
+                        .requestMatchers("/api/password/**").permitAll()
 
                         // Materias - Solo lectura publica
-                        .requestMatchers(HttpMethod.GET, "/api/materias", "/api/materias/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/materias/**").permitAll()
 
                         // Recursos - Solo lectura y descarga publica
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/recursos",
-                                "/api/recursos/**"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recursos/**").permitAll()
 
                         // Reportes - Publicos
                         .requestMatchers(HttpMethod.GET, "/api/reportes/**").permitAll()
 
                         // Estadisticas generales - Publicas
-                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/resumen").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/**").permitAll()
+
+                        // Fotos de perfil - Lectura publica
+                        .requestMatchers(HttpMethod.GET, "/api/perfil/foto/**").permitAll()
 
                         // Internacionalizacion - Publico
                         .requestMatchers("/api/idioma/**").permitAll()
@@ -71,25 +70,26 @@ public class SecurityConfig {
                         // RUTAS PROTEGIDAS CON AUTENTICACION
                         // ==========================================
 
-                        // Perfil - Cualquier usuario autenticado
-                        .requestMatchers("/api/perfil", "/api/perfil/**").authenticated()
-
-                        // Dashboard - Solo ADMIN
+                        // Dashboard
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-                        // Gestion de usuarios - Solo ADMIN
-                        .requestMatchers("/api/usuarios", "/api/usuarios/**").hasAuthority("ADMIN")
+                        // Perfil
+                        .requestMatchers("/api/perfil/**").authenticated()
 
-                        // Materias - Crear/Editar/Eliminar solo ADMIN
-                        .requestMatchers(HttpMethod.POST, "/api/materias").hasAuthority("ADMIN")
+                        // Gestion de usuarios
+                        .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
+
+                        // Materias - Crear/Editar/Eliminar
+                        .requestMatchers(HttpMethod.POST, "/api/materias/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasAuthority("ADMIN")
 
-                        // Recursos - Subir: DOCENTE o ADMIN
+                        // Recursos - Subir
                         .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyAuthority("DOCENTE", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyAuthority("DOCENTE", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasAuthority("ADMIN")
 
+                        // Cualquier otra ruta requiere autenticacion
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
