@@ -26,11 +26,42 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
                         // ==========================================
-                        // RUTAS COMPLETAMENTE PUBLICAS (sin token)
+                        // ARCHIVOS ESTÁTICOS DEL FRONTEND (HTML, CSS, JS, IMÁGENES)
                         // ==========================================
                         .requestMatchers(
-                                // Swagger UI
+
+                                "/",
+                                "/home.html",
+                                "/login.html",
+                                "/registro.html",
+                                "/recuperar-password.html",
+                                "/materias.html",
+                                "/recursos.html",
+                                "/perfil.html",
+                                "/editar-perfil.html",
+                                "/cambiar-password.html",
+                                "/admin-dashboard.html",
+                                "/admin-materias.html",
+                                "/admin-recursos.html",
+                                "/admin-usuarios.html",
+                                "/subir-recurso.html",
+                                "/404.html",
+
+                                // Recursos estáticos (CSS, JS, Imágenes)
+                                "/assets/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/icons/**",
+                                "/favicon.ico"
+                        ).permitAll()
+
+                        // ==========================================
+                        // SWAGGER / API DOCS
+                        // ==========================================
+                        .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -39,57 +70,86 @@ public class SecurityConfig {
                                 "/api-docs/**"
                         ).permitAll()
 
-                        // Autenticacion
+                        // ==========================================
+                        // AUTENTICACIÓN (PÚBLICO)
+                        // ==========================================
                         .requestMatchers(
-                                "/api/usuarios/registro",
-                                "/api/usuarios/login"
+                                "/api/usuarios/registro",    // Registro de usuarios
+                                "/api/usuarios/login"        // Login (obtener JWT)
                         ).permitAll()
 
-                        // Gestion de contraseñas
-                        .requestMatchers("/api/password/**").permitAll()
+                        // ==========================================
+                        // GESTIÓN DE CONTRASEÑAS (PÚBLICO)
+                        // ==========================================
+                        .requestMatchers(
+                                "/api/password/recuperar",           // Solicitar recuperación
+                                "/api/password/cambiar",             // Cambiar con token
+                                "/api/password/validar-token"        // Validar token de recuperación
+                        ).permitAll()
 
-                        // Materias - Solo lectura publica
-                        .requestMatchers(HttpMethod.GET, "/api/materias/**").permitAll()
+                        // ==========================================
+                        // MATERIAS (Lectura pública / Escritura ADMIN)
+                        // ==========================================
+                        .requestMatchers(HttpMethod.GET, "/api/materias/**").permitAll()        // Ver materias (público)
+                        .requestMatchers(HttpMethod.POST, "/api/materias").hasAuthority("ADMIN")       // Crear materia
+                        .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasAuthority("ADMIN")     // Editar materia
+                        .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasAuthority("ADMIN")  // Eliminar materia
 
-                        // Recursos - Solo lectura y descarga publica
-                        .requestMatchers(HttpMethod.GET, "/api/recursos/**").permitAll()
+                        // ==========================================
+                        // RECURSOS (Lectura pública / Subida DOCENTE/ADMIN)
+                        // ==========================================
+                        .requestMatchers(HttpMethod.GET, "/api/recursos/**").permitAll()               // Ver/Descargar recursos (público)
+                        .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyAuthority("DOCENTE", "ADMIN")  // Subir PDF
+                        .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasAuthority("ADMIN")     // Editar recurso
+                        .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyAuthority("DOCENTE", "ADMIN")   // Eliminar recurso
 
-                        // Reportes - Publicos
-                        .requestMatchers(HttpMethod.GET, "/api/reportes/**").permitAll()
+                        // ==========================================
+                        // PERFIL DE USUARIO (AUTENTICADO)
+                        // ==========================================
+                        .requestMatchers(
+                                "/api/perfil/usuario",              // Obtener datos del perfil
+                                "/api/perfil/actualizar",           // Actualizar datos del perfil
+                                "/api/perfil/subir-foto",           // Subir foto de perfil
+                                "/api/perfil/cambiar-password"      // Cambiar contraseña (autenticado)
+                        ).authenticated()
 
-                        // Estadisticas generales - Publicas
-                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/**").permitAll()
-
-                        // Fotos de perfil - Lectura publica
+                        // Fotos de perfil - Lectura pública
                         .requestMatchers(HttpMethod.GET, "/api/perfil/foto/**").permitAll()
 
-                        // Internacionalizacion - Publico
+                        // ==========================================
+                        // DASHBOARD ADMINISTRATIVO (SOLO ADMIN)
+                        // ==========================================
+                        .requestMatchers(
+                                "/api/admin/dashboard/estadisticas",     // Estadísticas del dashboard
+                                "/api/admin/usuarios",                   // Listar usuarios
+                                "/api/admin/usuarios/**",                // Gestionar usuarios
+                                "/api/admin/reportes/**"                 // Generar reportes
+                        ).hasAuthority("ADMIN")
+
+                        // ==========================================
+                        // GESTIÓN DE USUARIOS (SOLO ADMIN)
+                        // ==========================================
+                        .requestMatchers(
+                                "/api/usuarios",                         // Listar todos los usuarios
+                                "/api/usuarios/{id}",                    // Ver/Editar/Eliminar usuario específico
+                                "/api/usuarios/{id}/rol",                // Cambiar rol de usuario
+                                "/api/usuarios/{id}/estado"              // Activar/desactivar usuario
+                        ).hasAuthority("ADMIN")
+
+                        // ==========================================
+                        // REPORTES Y ESTADÍSTICAS (PÚBLICO SEGÚN NECESIDAD)
+                        // ==========================================
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/**").permitAll()
+
+                        // ==========================================
+                        // INTERNACIONALIZACIÓN (PÚBLICO)
+                        // ==========================================
                         .requestMatchers("/api/idioma/**").permitAll()
 
                         // ==========================================
-                        // RUTAS PROTEGIDAS CON AUTENTICACION
+                        // CUALQUIER OTRA RUTA REQUIERE AUTENTICACIÓN
                         // ==========================================
-
-                        // Dashboard
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-
-                        // Perfil
-                        .requestMatchers("/api/perfil/**").authenticated()
-
-                        // Gestion de usuarios
-                        .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
-
-                        // Materias - Crear/Editar/Eliminar
-                        .requestMatchers(HttpMethod.POST, "/api/materias/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasAuthority("ADMIN")
-
-                        // Recursos - Subir
-                        .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyAuthority("DOCENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyAuthority("DOCENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasAuthority("ADMIN")
-
-                        // Cualquier otra ruta requiere autenticacion
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
