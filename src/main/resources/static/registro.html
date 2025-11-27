@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Regístrate en EduAventuras">
+    <title>Registrarse - EduAventuras</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<!-- ===== CONTAINER PRINCIPAL ===== -->
+<div class="auth-container">
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            <!-- ===== COLUMNA IZQUIERDA: ILUSTRACIÓN ===== -->
+            <div class="col-lg-6 auth-image-section d-none d-lg-flex">
+                <div class="auth-image-content">
+                    <a href="home.html" class="logo-link">
+                    </a>
+                    <img src="assets/images/subjects/card-matematicas.png" alt="Estudiante" class="auth-illustration">
+                    <h2 class="auth-image-title">¡Únete a EduAventuras!</h2>
+                    <p class="auth-image-subtitle">Comienza tu viaje educativo hoy</p>
+                </div>
+            </div>
+
+            <!-- ===== COLUMNA DERECHA: FORMULARIO ===== -->
+            <div class="col-lg-6 auth-form-section">
+                <div class="auth-form-content">
+
+                    <!-- Logo para móvil -->
+                    <div class="text-center d-lg-none mb-4">
+                        <a href="home.html">
+                            <img src="assets/images/Logo-Eduaventuras.svg" alt="EduAventuras" class="auth-logo-mobile">
+                        </a>
+                    </div>
+
+                    <!-- Título -->
+                    <div class="auth-header">
+                        <h1>Crear Cuenta</h1>
+                        <p>Completa el formulario para registrarte</p>
+                    </div>
+
+                    <!-- Alertas -->
+                    <div id="alertContainer"></div>
+
+                    <!-- Formulario -->
+                    <form id="registroForm" class="auth-form">
+
+                        <!-- Nombre -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nombre" class="form-label">
+                                        <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
+                                        Nombre
+                                    </label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="nombre"
+                                            name="nombre"
+                                            placeholder="Juan"
+                                            required
+                                            minlength="2"
+                                            autocomplete="given-name">
+                                    <div class="invalid-feedback">
+                                        El nombre es obligatorio
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="apellido" class="form-label">
+                                        <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
+                                        Apellido
+                                    </label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="apellido"
+                                            name="apellido"
+                                            placeholder="Pérez"
+                                            required
+                                            minlength="2"
+                                            autocomplete="family-name">
+                                    <div class="invalid-feedback">
+                                        El apellido es obligatorio
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
+                                Correo Electrónico
+                            </label>
+                            <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    placeholder="ejemplo@correo.com"
+                                    required
+                                    autocomplete="email">
+                            <div class="invalid-feedback">
+                                Ingresa un correo válido
+                            </div>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <img src="assets/images/icons/candado.png" alt="" class="icon-label">
+                                Contraseña
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Mínimo 6 caracteres"
+                                        required
+                                        minlength="6"
+                                        autocomplete="new-password">
+                                <button type="button" class="toggle-password" id="togglePassword">
+                                    <span id="eyeIcon">👁️</span>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                La contraseña debe tener al menos 6 caracteres
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Contraseña -->
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">
+                                <img src="assets/images/icons/candado.png" alt="" class="icon-label">
+                                Confirmar Contraseña
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input
+                                        type="password"
+                                        class="form-control"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        placeholder="Repite tu contraseña"
+                                        required
+                                        autocomplete="new-password">
+                                <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                                    <span id="eyeIcon2">👁️</span>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="passwordMatchError">
+                                Las contraseñas no coinciden
+                            </div>
+                        </div>
+
+                        <!-- Rol -->
+                        <div class="form-group">
+                            <label for="rol" class="form-label">
+                                👤 Tipo de Usuario
+                            </label>
+                            <select class="form-control" id="rol" name="rol" required>
+                                <option value="">Selecciona tu rol</option>
+                                <option value="ESTUDIANTE">Estudiante</option>
+                                <option value="DOCENTE">Docente</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Selecciona un tipo de usuario
+                            </div>
+                        </div>
+
+                        <!-- Términos y condiciones -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terminos" required>
+                            <label class="form-check-label" for="terminos">
+                                Acepto los <a href="#" class="text-decoration-none">términos y condiciones</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                Debes aceptar los términos y condiciones
+                            </div>
+                        </div>
+
+                        <!-- Botón de envío -->
+                        <button type="submit" class="btn btn-primary btn-submit" id="btnRegistro">
+                            <span id="btnText">Crear Cuenta</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        </button>
+
+                        <!-- Separador -->
+                        <div class="auth-divider">
+                            <span>o</span>
+                        </div>
+
+                        <!-- Link a login -->
+                        <div class="auth-footer">
+                            <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+                        </div>
+
+                        <!-- Volver al inicio -->
+                        <div class="text-center mt-3">
+                            <a href="home.html" class="back-to-home">
+                                ← Volver al inicio
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script src="js/registro.js"></script>
+</body>
+</html>
