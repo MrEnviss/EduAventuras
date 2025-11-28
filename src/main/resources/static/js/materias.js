@@ -6,26 +6,29 @@ let materiasFiltradas = [];
 
 // ===== MAPEO DE IMÁGENES POR MATERIA =====
 const imagenesMateria = {
-    'Matemáticas': 'assets/images/subjects/card-matematicas.png',
+    'Matemáticas y geometria': 'assets/images/subjects/card-matematicas.png',
     'Matemática': 'assets/images/subjects/card-matematicas.png',
     'Ciencias Naturales': 'assets/images/subjects/card-ciencias.png',
     'Ciencias': 'assets/images/subjects/card-ciencias.png',
     'Español': 'assets/images/subjects/card-lenguajeliteratura.png',
     'Lenguaje': 'assets/images/subjects/card-lenguajeliteratura.png',
-    'Lengua y Literatura': 'assets/images/subjects/card-lenguajeliteratura.png',
-    'Literatura': 'assets/images/subjects/card-lenguajeliteratura.png'
+    'Lenguaje y Literatura': 'assets/images/subjects/card-lenguajeliteratura.png',
+    'Literatura': 'assets/images/subjects/card-lenguajeliteratura.png',
+    'Ingles': 'assets/images/subjects/card-ingles.png',
+    'Quimica': 'assets/images/subjects/card-quimica.png',
+
 };
 
 const imagenDefault = 'assets/images/hero/landing-page.png';
 
 // ===== MAPEO DE BADGES =====
 const badgesMateria = {
-    'Matemáticas': 'badge-matematicas',
+    'Matemáticas y geometria': 'badge-matematicas',
     'Matemática': 'badge-matematicas',
     'Ciencias Naturales': 'badge-ciencias',
-    'Ciencias': 'badge-ciencias',
+    'Ciencias y Quimica': 'badge-ciencias',
     'Español': 'badge-espanol',
-    'Lenguaje': 'badge-espanol',
+    'Lenguaje y Literatura': 'badge-espanol',
     'Lengua y Literatura': 'badge-espanol',
     'Literatura': 'badge-espanol'
 };

@@ -18,6 +18,7 @@ public class MateriaService {
 
     @Autowired
     private RecursoRepository recursoRepository;
+
     /**
      * Crear una nueva materia (solo admin)
      */
@@ -81,10 +82,11 @@ public class MateriaService {
         Materia materia = materiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
 
-        // Verificar que no tenga recursos asociados
-        long cantidadRecursos = recursoRepository.countByMateriaId(id);
-        if (cantidadRecursos > 0) {
-            throw new RuntimeException("No se puede eliminar una materia con recursos asociados");
+        // ✅ CORREGIDO: Verificar que no tenga recursos ACTIVOS asociados
+        long cantidadRecursosActivos = recursoRepository.countByMateriaIdAndActivo(id, true);
+        if (cantidadRecursosActivos > 0) {
+            throw new RuntimeException("No se puede eliminar una materia con recursos activos asociados. " +
+                    "Primero elimina los " + cantidadRecursosActivos + " recursos.");
         }
 
         materia.setActivo(false);
@@ -108,8 +110,8 @@ public class MateriaService {
         dto.setDescripcion(materia.getDescripcion());
         dto.setIcono(materia.getIcono());
 
-        // Contar recursos asociados
-        long cantidadRecursos = recursoRepository.countByMateriaId(materia.getId());
+        // ✅ CORREGIDO: Contar SOLO recursos activos
+        long cantidadRecursos = recursoRepository.countByMateriaIdAndActivo(materia.getId(), true);
         dto.setCantidadRecursos(cantidadRecursos);
 
         return dto;
