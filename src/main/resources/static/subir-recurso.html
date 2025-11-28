@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Recurso - EduAventuras</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/subir-recurso.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <img src="assets/images/Logo-Eduaventuras.svg" alt="EduAventuras" class="logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="materias.html">Materias</a>
+                </li>
+
+                <!-- Selector de idioma -->
+                <li class="nav-item">
+                    <div class="language-selector">
+                        <button class="btn-lang" id="btnLanguage">
+                            🌍 <span id="langLabel">ES</span>
+                        </button>
+                        <div class="lang-dropdown" id="langDropdown">
+                            <a href="#" data-lang="es">🇪🇸 Español</a>
+                            <a href="#" data-lang="en">🇺🇸 English</a>
+                            <a href="#" data-lang="fr">🇫🇷 Français</a>
+                        </div>
+                    </div>
+                </li>
+
+                <!-- Dropdown de usuario -->
+                <li class="nav-item nav-authenticated" style="display: none;">
+                    <div class="user-dropdown">
+                        <button class="btn-user" id="btnUserDropdown">
+                            👤 <span id="userName">Usuario</span> ▼
+                        </button>
+                        <div class="dropdown-menu-custom" id="userDropdownMenu">
+                            <a href="perfil.html" class="dropdown-item">Mi Perfil</a>
+                            <a href="admin-dashboard.html" class="dropdown-item nav-admin" style="display: none;">Dashboard</a>
+                            <a href="subir-recurso.html" class="dropdown-item nav-docente nav-admin" style="display: none;">Subir Recurso</a>
+                            <div class="dropdown-divider"></div>
+                            <button onclick="logout()" class="dropdown-item logout-btn">Cerrar Sesión</button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Main Content -->
+<main class="upload-container">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="upload-header">
+            <div class="header-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </div>
+            <h1>Subir Nuevo Recurso</h1>
+            <p>Comparte material educativo con tus estudiantes</p>
+        </div>
+
+        <!-- Alertas -->
+        <div id="alertContainer"></div>
+
+        <!-- Formulario -->
+        <form id="formSubirRecurso" class="upload-form">
+
+            <!-- Título -->
+            <div class="form-group">
+                <label for="titulo" class="form-label required">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 7h16M4 12h16M4 17h10"/>
+                    </svg>
+                    Título del Recurso
+                </label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="titulo"
+                        name="titulo"
+                        placeholder="Ejemplo: Guía de Álgebra Básica"
+                        required
+                        maxlength="200">
+                <div class="form-hint">Máximo 200 caracteres</div>
+                <div class="invalid-feedback">El título es obligatorio</div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-group">
+                <label for="descripcion" class="form-label required">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    Descripción
+                </label>
+                <textarea
+                        class="form-control"
+                        id="descripcion"
+                        name="descripcion"
+                        rows="4"
+                        placeholder="Describe brevemente el contenido del recurso..."
+                        required
+                        maxlength="500"></textarea>
+                <div class="form-hint">
+                    <span id="charCount">0</span>/500 caracteres
+                </div>
+                <div class="invalid-feedback">La descripción es obligatoria</div>
+            </div>
+
+            <!-- Materia -->
+            <div class="form-group">
+                <label for="materiaId" class="form-label required">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    Materia
+                </label>
+                <select class="form-control" id="materiaId" name="materiaId" required>
+                    <option value="">Selecciona una materia...</option>
+                    <!-- Se cargarán dinámicamente -->
+                </select>
+                <div class="invalid-feedback">Debes seleccionar una materia</div>
+            </div>
+
+            <!-- Archivo PDF -->
+            <div class="form-group">
+                <label class="form-label required">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Archivo PDF
+                </label>
+
+                <!-- Drag & Drop Zone -->
+                <div class="file-upload-zone" id="dropZone">
+                    <input
+                            type="file"
+                            id="file"
+                            name="file"
+                            accept=".pdf"
+                            required
+                            style="display: none;">
+
+                    <div class="upload-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+
+                    <p class="upload-text">
+                        <strong>Arrastra tu archivo PDF aquí</strong><br>
+                        o haz clic para seleccionarlo
+                    </p>
+
+                    <button type="button" class="btn-select-file" id="btnSelectFile">
+                        Seleccionar Archivo
+                    </button>
+
+                    <div class="upload-hint">Tamaño máximo: 10 MB</div>
+                </div>
+
+                <!-- Vista previa del archivo -->
+                <div id="filePreview" class="file-preview" style="display: none;">
+                    <div class="file-info">
+                        <div class="file-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <div class="file-details">
+                            <p class="file-name" id="fileName"></p>
+                            <p class="file-size" id="fileSize"></p>
+                        </div>
+                        <button type="button" class="btn-remove-file" id="btnRemoveFile">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="invalid-feedback">Debes seleccionar un archivo PDF</div>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"/>
+                        <polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary" id="btnSubmit">
+                    <span id="btnText">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Subir Recurso
+                    </span>
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>EduAventuras</h5>
+                <p>Plataforma educativa gratuita dedicada a brindar recursos de calidad.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Enlaces</h5>
+                <ul>
+                    <li><a href="home.html">Inicio</a></li>
+                    <li><a href="materias.html">Materias</a></li>
+                    <li><a href="login.html">Iniciar Sesión</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5>Contacto</h5>
+                <ul>
+                    <li><a href="mailto:info@eduaventuras.com">info@eduaventuras.com</a></li>
+                    <li><a href="#">Soporte</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 EduAventuras. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/subir-recurso.js"></script>
+
+<script>
+    // Dropdown de idiomas y usuario
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnLanguage = document.getElementById('btnLanguage');
+        const langDropdown = document.getElementById('langDropdown');
+
+        if (btnLanguage && langDropdown) {
+            btnLanguage.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langDropdown.style.display = langDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', () => {
+                langDropdown.style.display = 'none';
+            });
+        }
+
+        const btnUserDropdown = document.getElementById('btnUserDropdown');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+        if (btnUserDropdown && userDropdownMenu) {
+            btnUserDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdownMenu.style.display = userDropdownMenu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', () => {
+                userDropdownMenu.style.display = 'none';
+            });
+        }
+
+        actualizarNavbar();
+    });
+</script>
+
+</body>
+</html>
