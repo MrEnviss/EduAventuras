@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Materias - EduAventuras</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/admin-materias.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <img src="assets/images/Logo-Eduaventuras.svg" alt="EduAventuras" class="logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="materias.html">Materias</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="admin-dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="admin-materias.html">Gestionar Materias</a>
+                </li>
+                <li class="nav-item nav-authenticated" style="display: none;">
+                    <span class="navbar-text" id="navbarUserName"></span>
+                </li>
+                <li class="nav-item nav-authenticated" style="display: none;">
+                    <button onclick="logout()" class="btn btn-outline-danger">
+                        Cerrar Sesión
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="admin-materias-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1>📚 Gestión de Materias</h1>
+            <p>Administra las materias disponibles en la plataforma</p>
+        </div>
+        <button id="btnNuevaMateria" class="btn-nueva-materia">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Nueva Materia
+        </button>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="search-filter-section">
+        <div class="search-box">
+            <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Buscar materias por nombre o descripción..."
+                    autocomplete="off"
+            >
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+        </div>
+        <div class="filter-info">
+            <span id="totalMaterias">0</span> materias en total
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingMaterias" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando materias...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <img src="assets/images/empty-states/sin_recursos.png" alt="Sin materias">
+        <h3>No hay materias registradas</h3>
+        <p>Comienza agregando tu primera materia</p>
+        <button onclick="abrirModalNueva()" class="btn-cta">
+            Crear Primera Materia
+        </button>
+    </div>
+
+    <!-- Materias Table -->
+    <div id="materiasTable" class="materias-table" style="display: none;">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th class="text-center">Recursos</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody id="materiasTableBody">
+                <!-- Se llena dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal Crear/Editar Materia -->
+<div id="materiaModal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Materia</h3>
+                <button type="button" class="btn-close" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="materiaForm">
+                    <input type="hidden" id="materiaId">
+
+                    <div class="form-group">
+                        <label for="nombre">Nombre de la Materia *</label>
+                        <input
+                                type="text"
+                                id="nombre"
+                                class="form-control"
+                                placeholder="Ej: Matemáticas"
+                                required
+                                maxlength="100"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción *</label>
+                        <textarea
+                                id="descripcion"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Describe brevemente el contenido de esta materia..."
+                                required
+                                maxlength="500"
+                        ></textarea>
+                        <small class="form-text">Máximo 500 caracteres</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagenUrl">URL de la Imagen</label>
+                        <input
+                                type="url"
+                                id="imagenUrl"
+                                class="form-control"
+                                placeholder="https://ejemplo.com/imagen.jpg"
+                        >
+                        <small class="form-text">Deja vacío para usar la imagen por defecto</small>
+                    </div>
+
+                    <div id="alertModal" class="alert" style="display: none;"></div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="cerrarModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-primary" id="btnGuardar">
+                            <span id="btnGuardarText">Guardar</span>
+                            <span id="btnGuardarSpinner" class="spinner-small" style="display: none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Eliminación -->
+<div id="deleteModal" class="modal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚠️ Confirmar Eliminación</h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de eliminar esta materia?</p>
+                <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
+                <p class="text-muted">Se eliminarán también todos los recursos asociados.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="cerrarModalDelete()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-danger" id="btnConfirmarDelete">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Auth Module -->
+<script src="js/auth.js"></script>
+<!-- Admin Materias JS -->
+<script src="js/admin-materias.js"></script>
+
+</body>
+</html>
