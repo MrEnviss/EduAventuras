@@ -1,9 +1,11 @@
 package com.eduaventuras.service;
 
 import com.eduaventuras.model.Descarga;
+import com.eduaventuras.model.Materia;
 import com.eduaventuras.model.Recurso;
 import com.eduaventuras.model.Usuario;
 import com.eduaventuras.repository.DescargaRepository;
+import com.eduaventuras.repository.MateriaRepository;
 import com.eduaventuras.repository.RecursoRepository;
 import com.eduaventuras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,11 @@ public class DescargaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private MateriaRepository materiaRepository;
+
     /**
      * Registrar una descarga
-     * Se llama automáticamente cuando alguien descarga un recurso
      */
     public void registrarDescarga(Long recursoId, Long usuarioId) {
         Recurso recurso = recursoRepository.findById(recursoId)
@@ -81,8 +85,17 @@ public class DescargaService {
     public List<Map<String, Object>> obtenerRecursosMasDescargados(int limite) {
         List<Descarga> todasLasDescargas = descargaRepository.findAll();
 
-        // Agrupar descargas por recurso y contar
+        // **CORRECCIÓN ROBUSTA:** Filtro con try-catch para evitar errores de Lazy Loading
         Map<Long, Long> conteoPorRecurso = todasLasDescargas.stream()
+                .filter(d -> {
+                    try {
+                        // Forzar la inicialización de la entidad y chequear por nulos
+                        return d.getRecurso() != null && d.getRecurso().getId() != null;
+                    } catch (Exception e) {
+                        // Capturar excepción de entidad no encontrada y descartar la descarga.
+                        return false;
+                    }
+                })
                 .collect(Collectors.groupingBy(
                         d -> d.getRecurso().getId(),
                         Collectors.counting()
@@ -100,7 +113,7 @@ public class DescargaService {
                     if (recurso != null) {
                         info.put("recursoId", recurso.getId());
                         info.put("titulo", recurso.getTitulo());
-                        info.put("materia", recurso.getMateria().getNombre());
+                        info.put("materia", recurso.getMateria() != null ? recurso.getMateria().getNombre() : "N/A");
                         info.put("cantidadDescargas", entry.getValue());
                     }
                     return info;
@@ -114,6 +127,16 @@ public class DescargaService {
      */
     public List<Map<String, Object>> obtenerDescargasRecientes(int limite) {
         return descargaRepository.findAll().stream()
+                .filter(d -> {
+                    try {
+                        // **CORRECCIÓN ROBUSTA:** Forzar la inicialización y chequear Recurso y Usuario
+                        return d.getRecurso() != null && d.getUsuario() != null &&
+                                d.getRecurso().getId() != null && d.getUsuario().getId() != null;
+                    } catch (Exception e) {
+                        // Capturar excepción y descartar
+                        return false;
+                    }
+                })
                 .sorted((d1, d2) -> d2.getFechaDescarga().compareTo(d1.getFechaDescarga()))
                 .limit(limite)
                 .map(descarga -> {
@@ -122,6 +145,26 @@ public class DescargaService {
                     info.put("usuarioNombre", descarga.getUsuario().getNombre() + " " +
                             descarga.getUsuario().getApellido());
                     info.put("fecha", descarga.getFechaDescarga());
+                    return info;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * NUEVA FUNCIÓN: Obtener el conteo de recursos por materia.
+     */
+    public List<Map<String, Object>> obtenerConteoRecursosPorMateria() {
+        // Obtenemos solo las materias activas
+        List<Materia> materias = materiaRepository.findByActivo(true);
+
+        return materias.stream()
+                .map(materia -> {
+                    // Contamos los recursos activos por el ID de la materia
+                    long conteo = recursoRepository.countByMateriaId(materia.getId());
+
+                    Map<String, Object> info = new HashMap<>();
+                    info.put("nombreMateria", materia.getNombre());
+                    info.put("conteoRecursos", conteo);
                     return info;
                 })
                 .collect(Collectors.toList());
