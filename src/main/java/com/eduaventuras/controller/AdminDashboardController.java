@@ -52,12 +52,16 @@ public class AdminDashboardController {
             contenido.put("totalDescargas", descargaService.contarTotalDescargas());
             stats.put("contenido", contenido);
 
+            // ¡NUEVO! Conteo de recursos por materia
+            stats.put("recursosPorMateria", descargaService.obtenerConteoRecursosPorMateria());
+
             // Recursos más descargados (top 5)
             stats.put("recursosPopulares", descargaService.obtenerRecursosMasDescargados(5));
 
             // Actividad reciente
             stats.put("usuariosRecientes", usuarioService.obtenerUsuariosRecientes(5));
             stats.put("recursosRecientes", recursoService.obtenerRecursosRecientes(5));
+            stats.put("descargasRecientes", descargaService.obtenerDescargasRecientes(5)); // Agregado
 
             return ResponseEntity.ok(stats);
         } catch (Exception e) {

@@ -1,6 +1,6 @@
 // ===== MAPEO DE IMÁGENES POR MATERIA =====
 const imagenesMateria = {
-    'Matemáticas': 'assets/images/subjects/card-matematicas.png',
+    'Matemáticas y geometria': 'assets/images/subjects/card-matematicas.png',
     'Matemática': 'assets/images/subjects/card-matematicas.png',
     'Ciencias Naturales': 'assets/images/subjects/card-ciencias.png',
     'Ciencias': 'assets/images/subjects/card-ciencias.png',

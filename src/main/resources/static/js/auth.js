@@ -46,16 +46,27 @@ function hasRole(rolRequerido) {
 function logout() {
     console.log('🚪 Cerrando sesión...');
 
-    // Limpiar localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('recordarme');
+    // Limpiar localStorage COMPLETAMENTE
+    localStorage.clear();
+    sessionStorage.clear();
 
-    console.log('✅ Sesión cerrada');
+    console.log('✅ Sesión cerrada - localStorage limpiado');
 
     // Redirigir al login
     window.location.href = 'login.html?mensaje=Sesión cerrada correctamente&tipo=success';
 }
+
+// ===== GESTIÓN AUTOMÁTICA DE SESIÓN =====
+// Cerrar sesión al cerrar la pestaña (si no está "Recordarme" activo)
+window.addEventListener('beforeunload', () => {
+    const recordarme = localStorage.getItem('recordarme');
+
+    if (recordarme !== 'true') {
+        console.log('🚪 Cerrando sesión automáticamente (pestaña cerrada)');
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+    }
+});
 
 // ===== FUNCIÓN: PROTEGER PÁGINA (Requiere autenticación) =====
 function protegerPagina() {

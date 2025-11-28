@@ -37,43 +37,19 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="materias.html" data-i18n="navbar.materias">Materias</a>
-                </li>
+
+
+
                 <!-- SELECTOR DE IDIOMA -->
                 <li class="nav-item">
                     <div class="language-selector">
-                        <button class="btn-lang" id="btnLanguage" title="Seleccionar idioma">
-                            🌐 <span id="langLabel">ES</span>
+                        <button class="btn-lang" id="btnLanguage">
+                            🌍 <span id="langLabel">ES</span>
                         </button>
                         <div class="lang-dropdown" id="langDropdown">
                             <a href="#" data-lang="es">🇪🇸 Español</a>
                             <a href="#" data-lang="en">🇺🇸 English</a>
                             <a href="#" data-lang="fr">🇫🇷 Français</a>
-                        </div>
-                    </div>
-                </li>
-
-
-
-                <!-- DROPDOWN USUARIO (solo autenticados) -->
-                <li class="nav-item nav-authenticated" style="display: none;">
-                    <div class="user-dropdown">
-                        <button class="btn-user" id="btnUserDropdown">
-                            👤 <span id="userName">Usuario</span> ▼
-                        </button>
-                        <div class="dropdown-menu-custom" id="userDropdownMenu">
-                            <a href="perfil.html" class="dropdown-item nav-authenticated" data-i18n="dropdown.perfil">
-                                Mi Perfil
-                            </a>
-                            <a href="admin-dashboard.html" class="dropdown-item nav-admin" style="display: none;" data-i18n="dropdown.dashboard">
-                                Dashboard
-                            </a>
-                            <a href="subir-recurso.html" class="dropdown-item nav-docente nav-admin" style="display: none;" data-i18n="dropdown.subir">
-                                Subir Recurso
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <button onclick="logout()" class="dropdown-item logout-btn" data-i18n="dropdown.salir">
-                                Cerrar Sesión
-                            </button>
                         </div>
                     </div>
                 </li>

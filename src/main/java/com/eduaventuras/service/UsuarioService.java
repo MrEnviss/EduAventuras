@@ -283,6 +283,48 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    public void eliminarPermanente(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Eliminar físicamente de la base de datos
+        usuarioRepository.delete(usuario);
+    }
+
+    /**
+     * Cambiar estado (activo/inactivo) de usuario
+     */
+    public UsuarioDTO cambiarEstado(Long id, Boolean activo) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setActivo(activo);
+        Usuario actualizado = usuarioRepository.save(usuario);
+
+        return convertirADTO(actualizado);
+    }
+
+    /**
+     * Cambiar rol de usuario
+     */
+    public UsuarioDTO cambiarRol(Long id, Rol nuevoRol) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setRol(nuevoRol);
+        Usuario actualizado = usuarioRepository.save(usuario);
+
+        return convertirADTO(actualizado);
+    }
+
+    /**
+     */
+    public void desactivar(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setActivo(false);
+        usuarioRepository.save(usuario);
+    }
     /**
      * Contar usuarios por rol
      */

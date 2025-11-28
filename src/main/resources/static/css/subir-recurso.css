@@ -1,9 +1,9 @@
 /* ===== SUBIR RECURSO CSS ===== */
 
 :root {
-    --primary: #0D5957;
+    --primary: #0d5957;
     --secondary: #F4C430;
-    --accent: #2DD4BF;
+    --accent: #000000;
     --dark: #2C3E50;
     --light: #F8F9FA;
     --white: #FFFFFF;
@@ -48,57 +48,61 @@
 .upload-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 3rem 1rem;
+    padding: 6rem 1rem 2rem 1rem;
     min-height: calc(100vh - 300px);
+    margin-top: 20px;
 }
 
 /* Upload Header */
 .upload-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 
 .header-icon {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 1rem;
     box-shadow: 0 8px 24px rgba(13, 89, 87, 0.2);
 }
 
 .header-icon svg {
     color: white;
+    width: 40px;
+    height: 40px;
 }
 
 .upload-header h1 {
     color: var(--primary);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .upload-header p {
     color: #666;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
 }
 
 /* Alert Container */
 #alertContainer {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .alert {
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     border-radius: 12px;
     border: none;
     display: flex;
     align-items: center;
     gap: 1rem;
     animation: slideDown 0.3s ease;
+    font-size: 0.95rem;
 }
 
 @keyframes slideDown {
@@ -131,12 +135,12 @@
 .upload-form {
     background: white;
     border-radius: 20px;
-    padding: 2.5rem;
+    padding: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .form-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-label {
@@ -145,8 +149,8 @@
     gap: 0.5rem;
     font-weight: 600;
     color: var(--dark);
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
 }
 
 .form-label.required::after {
@@ -157,13 +161,15 @@
 
 .form-label svg {
     color: var(--accent);
+    width: 18px;
+    height: 18px;
 }
 
 .form-control {
-    padding: 0.875rem 1.25rem;
+    padding: 0.75rem 1rem;
     border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    font-size: 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
     transition: all 0.3s;
     width: 100%;
 }
@@ -188,20 +194,20 @@
 
 textarea.form-control {
     resize: vertical;
-    min-height: 120px;
+    min-height: 100px;
 }
 
 .form-hint {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: #666;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
 }
 
 .invalid-feedback {
     display: none;
     color: var(--danger);
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
 }
 
 .form-control.is-invalid ~ .invalid-feedback {
@@ -212,7 +218,7 @@ textarea.form-control {
 .file-upload-zone {
     border: 3px dashed #d0d0d0;
     border-radius: 16px;
-    padding: 3rem 2rem;
+    padding: 2.5rem 1.5rem;
     text-align: center;
     background: #fafafa;
     transition: all 0.3s;
@@ -231,35 +237,38 @@ textarea.form-control {
 }
 
 .upload-icon {
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 1rem;
 }
 
 .upload-icon svg {
     color: var(--accent);
     opacity: 0.6;
+    width: 50px;
+    height: 50px;
 }
 
 .upload-text {
     color: #666;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 .upload-text strong {
     color: var(--primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .btn-select-file {
     background: var(--primary);
     color: white;
     border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 12px;
+    padding: 0.75rem 1.75rem;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 .btn-select-file:hover {
@@ -269,8 +278,8 @@ textarea.form-control {
 }
 
 .upload-hint {
-    margin-top: 1rem;
-    font-size: 0.875rem;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
     color: #999;
 }
 
@@ -279,7 +288,7 @@ textarea.form-control {
     background: #f0fffe;
     border: 2px solid var(--accent);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.25rem;
     margin-top: 1rem;
     animation: fadeIn 0.3s ease;
 }
@@ -303,10 +312,10 @@ textarea.form-control {
 
 .file-icon {
     flex-shrink: 0;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background: white;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -315,6 +324,8 @@ textarea.form-control {
 
 .file-icon svg {
     color: var(--danger);
+    width: 28px;
+    height: 28px;
 }
 
 .file-details {
@@ -325,22 +336,23 @@ textarea.form-control {
 .file-name {
     font-weight: 600;
     color: var(--dark);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 0.95rem;
 }
 
 .file-size {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: #666;
     margin: 0;
 }
 
 .btn-remove-file {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: white;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -363,24 +375,26 @@ textarea.form-control {
 .btn-remove-file svg {
     color: #999;
     transition: color 0.3s;
+    width: 18px;
+    height: 18px;
 }
 
 /* Form Actions */
 .form-actions {
     display: flex;
     gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 2rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
     border-top: 2px solid #f0f0f0;
 }
 
 .btn {
     flex: 1;
-    padding: 1rem 2rem;
+    padding: 0.9rem 1.5rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
@@ -418,6 +432,8 @@ textarea.form-control {
 
 .btn svg {
     flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
 .spinner-border-sm {
@@ -429,19 +445,19 @@ textarea.form-control {
 /* Responsive */
 @media (max-width: 768px) {
     .upload-container {
-        padding: 2rem 1rem;
+        padding: 1.5rem 1rem;
     }
 
     .upload-header h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
 
     .upload-form {
-        padding: 1.5rem;
+        padding: 1.25rem;
     }
 
     .file-upload-zone {
-        padding: 2rem 1rem;
+        padding: 1.75rem 1rem;
     }
 
     .form-actions {
