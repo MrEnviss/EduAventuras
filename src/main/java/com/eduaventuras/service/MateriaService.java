@@ -18,7 +18,6 @@ public class MateriaService {
 
     @Autowired
     private RecursoRepository recursoRepository;
-
     /**
      * Crear una nueva materia (solo admin)
      */

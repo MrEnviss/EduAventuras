@@ -28,7 +28,7 @@ public class MessageLoader {
                 .getResourceAsStream(nombreArchivo)) {
 
             if (input == null) {
-                System.err.println("❌ No se pudo encontrar el archivo: " + nombreArchivo);
+                System.err.println(" No se pudo encontrar el archivo: " + nombreArchivo);
                 return mensajesDefault();
             }
 
@@ -40,10 +40,10 @@ public class MessageLoader {
                 mensajes.put(key, prop.getProperty(key));
             }
 
-            System.out.println("✅ Mensajes cargados para idioma: " + idioma);
+            System.out.println("Mensajes cargados para idioma: " + idioma);
 
         } catch (IOException ex) {
-            System.err.println("❌ Error al cargar mensajes: " + ex.getMessage());
+            System.err.println("Error al cargar mensajes: " + ex.getMessage());
             return mensajesDefault();
         }
 

@@ -24,12 +24,12 @@ public class FileStorageConfig {
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
             if (created) {
-                System.out.println("✅ Directorio de uploads creado: " + uploadDir);
+                System.out.println("Directorio de uploads creado: " + uploadDir);
             } else {
-                System.err.println("❌ No se pudo crear el directorio de uploads: " + uploadDir);
+                System.err.println("No se pudo crear el directorio de uploads: " + uploadDir);
             }
         } else {
-            System.out.println("✅ Directorio de uploads ya existe: " + uploadDir);
+            System.out.println("Directorio de uploads ya existe: " + uploadDir);
         }
     }
 

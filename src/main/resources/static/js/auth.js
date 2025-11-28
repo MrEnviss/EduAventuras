@@ -15,7 +15,7 @@ function getCurrentUser() {
     try {
         return JSON.parse(usuarioString);
     } catch (error) {
-        console.error('Error al parsear usuario:', error);
+        console.error('❌ Error al parsear usuario:', error);
         return null;
     }
 }
@@ -24,14 +24,21 @@ function getCurrentUser() {
 function isAuthenticated() {
     const token = getToken();
     const usuario = getCurrentUser();
-    return !!(token && usuario);
+    const autenticado = !!(token && usuario);
+
+    console.log('🔑 isAuthenticated:', {
+        token: !!token,
+        usuario: !!usuario,
+        autenticado: autenticado
+    });
+
+    return autenticado;
 }
 
 // ===== FUNCIÓN: VERIFICAR ROL DEL USUARIO =====
 function hasRole(rolRequerido) {
     const usuario = getCurrentUser();
     if (!usuario) return false;
-
     return usuario.rol === rolRequerido;
 }
 
@@ -46,7 +53,7 @@ function logout() {
 
     console.log('✅ Sesión cerrada');
 
-    // Redirigir al login con mensaje
+    // Redirigir al login
     window.location.href = 'login.html?mensaje=Sesión cerrada correctamente&tipo=success';
 }
 
@@ -80,53 +87,92 @@ function protegerPaginaPorRol(rolesPermitidos) {
 // ===== FUNCIÓN: ACTUALIZAR NAVBAR SEGÚN AUTENTICACIÓN =====
 function actualizarNavbar() {
     const usuario = getCurrentUser();
-    const navbarNav = document.querySelector('#navbarNav .navbar-nav');
+    const autenticado = isAuthenticated();
 
-    if (!navbarNav) return; // Si no hay navbar, salir
+    console.log('🔄 Actualizando navbar...');
+    console.log('📊 Estado:', {
+        autenticado: autenticado,
+        usuario: usuario,
+        rol: usuario?.rol
+    });
 
-    // Buscar los botones de login/registro
-    const botonesAuth = navbarNav.querySelectorAll('.btn-login, .btn-register');
+    // Elementos del navbar
+    const navGuest = document.querySelectorAll('.nav-guest');
+    const navAuthenticated = document.querySelectorAll('.nav-authenticated');
+    const navAdmin = document.querySelectorAll('.nav-admin');
+    const navDocente = document.querySelectorAll('.nav-docente');
+    const userName = document.getElementById('userName');
 
-    if (isAuthenticated()) {
-        // Usuario autenticado: Mostrar perfil y logout
-        botonesAuth.forEach(btn => btn.parentElement.remove());
+    console.log('📋 Elementos encontrados:', {
+        navGuest: navGuest.length,
+        navAuthenticated: navAuthenticated.length,
+        navAdmin: navAdmin.length,
+        navDocente: navDocente.length,
+        userName: !!userName
+    });
 
-        // Agregar items del usuario
-        const userItems = `
-            <li class="nav-item">
-                <a class="nav-link" href="materias.html">Materias</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="perfil.html">Mi Perfil</a>
-            </li>
-            ${usuario.rol === 'ADMIN' ? `
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin-dashboard.html">Dashboard</a>
-                </li>
-            ` : ''}
-            ${usuario.rol === 'DOCENTE' || usuario.rol === 'ADMIN' ? `
-                <li class="nav-item">
-                    <a class="nav-link" href="/subir-recurso.html">Subir Recurso</a>
-                </li>
-            ` : ''}
-            <li class="nav-item ms-3">
-                <span class="navbar-text me-2">
-                    👤 ${usuario.nombre}
-                </span>
-            </li>
-            <li class="nav-item">
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm">
-                    Cerrar Sesión
-                </button>
-            </li>
-        `;
+    if (autenticado && usuario) {
+        // ✅ USUARIO LOGUEADO
+        console.log(`👤 Usuario autenticado: ${usuario.nombre} ${usuario.apellido || ''} (${usuario.rol})`);
 
-        navbarNav.insertAdjacentHTML('beforeend', userItems);
+        // Ocultar elementos de invitado
+        navGuest.forEach(el => {
+            el.style.display = 'none';
+            console.log('🔒 Ocultando botón guest:', el.textContent);
+        });
+
+        // Mostrar elementos de autenticado
+        navAuthenticated.forEach(el => {
+            el.style.display = 'block';
+            console.log('✅ Mostrando elemento autenticado');
+        });
+
+        // Actualizar nombre del usuario
+        if (userName) {
+            userName.textContent = usuario.nombre || 'Usuario';
+            console.log('✅ Nombre actualizado:', userName.textContent);
+        }
+
+        // Mostrar enlaces según ROL
+        if (usuario.rol === 'ADMIN') {
+            // ADMIN ve TODO
+            navAdmin.forEach(el => el.style.display = 'block');
+            console.log('👑 Permisos ADMIN activados');
+
+        } else if (usuario.rol === 'DOCENTE') {
+            // DOCENTE ve solo sus enlaces
+            navAdmin.forEach(el => el.style.display = 'none');
+            navDocente.forEach(el => {
+                if (!el.classList.contains('nav-admin')) {
+                    el.style.display = 'block';
+                }
+            });
+            console.log('👨‍🏫 Permisos DOCENTE activados');
+
+        } else if (usuario.rol === 'ESTUDIANTE') {
+            // ESTUDIANTE solo ve lo básico
+            navAdmin.forEach(el => el.style.display = 'none');
+            navDocente.forEach(el => el.style.display = 'none');
+            console.log('👤 Permisos ESTUDIANTE activados');
+        }
 
     } else {
-        // Usuario no autenticado: Mostrar login y registro (ya están en el HTML)
-        console.log('Usuario no autenticado - Navbar por defecto');
+        // ❌ USUARIO NO LOGUEADO
+        console.log('👋 Usuario no autenticado - Mostrando navbar público');
+
+        // Mostrar elementos de invitado
+        navGuest.forEach(el => {
+            el.style.display = 'block';
+            console.log('✅ Mostrando botón guest:', el.textContent);
+        });
+
+        // Ocultar elementos de autenticado
+        navAuthenticated.forEach(el => el.style.display = 'none');
+        navAdmin.forEach(el => el.style.display = 'none');
+        navDocente.forEach(el => el.style.display = 'none');
     }
+
+    console.log('✅ Navbar actualizado correctamente');
 }
 
 // ===== FUNCIÓN: OBTENER HEADERS CON AUTENTICACIÓN =====
@@ -167,13 +213,13 @@ async function fetchAutenticado(url, opciones = {}) {
         if (response.status === 401) {
             console.error('❌ Token inválido o expirado');
             logout();
-            throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+            throw new Error('Sesión expirada');
         }
 
         return response;
 
     } catch (error) {
-        console.error('Error en petición autenticada:', error);
+        console.error('❌ Error en petición autenticada:', error);
         throw error;
     }
 }
@@ -214,6 +260,16 @@ window.actualizarNavbar = actualizarNavbar;
 window.getAuthHeaders = getAuthHeaders;
 window.fetchAutenticado = fetchAutenticado;
 window.redirectByRole = redirectByRole;
-window.API_BASE_URL = API_BASE_URL;
+
+// ===== AUTO-ACTUALIZAR NAVBAR AL CARGAR =====
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 DOM cargado - Auto-actualizando navbar');
+        setTimeout(actualizarNavbar, 100); // Pequeño delay para asegurar que todo esté cargado
+    });
+} else {
+    console.log('📄 DOM ya cargado - Auto-actualizando navbar inmediatamente');
+    setTimeout(actualizarNavbar, 100);
+}
 
 console.log('✅ Módulo de autenticación cargado');

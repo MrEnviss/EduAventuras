@@ -45,7 +45,7 @@ public class ReporteService {
             PdfGenerator.agregarEncabezado(document, "EDUAVENTURAS - REPORTE DE ESTADÍSTICAS");
 
             // ===== SECCIÓN 1: ESTADÍSTICAS DE USUARIOS =====
-            PdfGenerator.agregarSeccion(document, "📊 ESTADÍSTICAS DE USUARIOS");
+            PdfGenerator.agregarSeccion(document, "USUARIOS");
 
             long totalUsuarios = usuarioService.listarTodos().size();
             long totalEstudiantes = usuarioService.contarPorRol(Rol.ESTUDIANTE);
@@ -62,7 +62,7 @@ public class ReporteService {
             PdfGenerator.agregarSeparador(document);
 
             // ===== SECCIÓN 2: ESTADÍSTICAS DE RECURSOS =====
-            PdfGenerator.agregarSeccion(document, "📚 ESTADÍSTICAS DE RECURSOS");
+            PdfGenerator.agregarSeccion(document, "RECURSOS");
 
             List<RecursoDTO> recursosActivos = recursoService.listarActivos();
             long totalRecursos = recursosActivos.size();
@@ -87,7 +87,7 @@ public class ReporteService {
             PdfGenerator.agregarSeparador(document);
 
             // ===== SECCIÓN 3: ESTADÍSTICAS DE DESCARGAS =====
-            PdfGenerator.agregarSeccion(document, "📥 ESTADÍSTICAS DE DESCARGAS");
+            PdfGenerator.agregarSeccion(document, "DESCARGAS");
 
             long totalDescargas = descargaService.contarTotalDescargas();
 
@@ -98,7 +98,7 @@ public class ReporteService {
             PdfGenerator.agregarSeparador(document);
 
             // ===== SECCIÓN 4: TOP RECURSOS MÁS DESCARGADOS =====
-            PdfGenerator.agregarSeccion(document, "🏆 TOP 10 RECURSOS MÁS DESCARGADOS");
+            PdfGenerator.agregarSeccion(document, " RECURSOS MÁS DESCARGADOS");
 
             List<RecursoDTO> topRecursos = recursosActivos.stream()
                     .sorted((r1, r2) -> Long.compare(r2.getCantidadDescargas(), r1.getCantidadDescargas()))
@@ -129,7 +129,7 @@ public class ReporteService {
             PdfGenerator.agregarParrafo(document,
                     "\nEste reporte fue generado automáticamente por el sistema EduAventuras.");
             PdfGenerator.agregarParrafo(document,
-                    "Plataforma educativa gratuita para niños de escasos recursos.");
+                    "Plataforma educativa gratuita");
 
             document.close();
 
@@ -173,7 +173,7 @@ public class ReporteService {
             PdfGenerator.agregarSeparador(document);
 
             // Lista de recursos
-            PdfGenerator.agregarSeccion(document, "📚 RECURSOS DISPONIBLES");
+            PdfGenerator.agregarSeccion(document, "RECURSOS DISPONIBLES");
 
             if (!recursos.isEmpty()) {
                 String[] headers = {"Título", "Subido por", "Descargas"};

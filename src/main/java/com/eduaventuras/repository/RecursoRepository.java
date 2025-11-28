@@ -10,4 +10,5 @@ public interface RecursoRepository extends JpaRepository<Recurso, Long> {
     List<Recurso> findByMateriaId(Long materiaId);
     List<Recurso> findByActivo(Boolean activo);
     long countByMateriaId(Long materiaId);
+    long countByMateriaIdAndActivo(Long materiaId, boolean activo);
 }

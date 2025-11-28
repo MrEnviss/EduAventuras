@@ -49,7 +49,6 @@ public class PasswordController {
             // Verificar que el email existe
             usuarioService.verificarEmailExiste(email);
 
-            // TODO: En producción, generar token y enviar email
             // Por ahora solo generamos un token temporal
             String tokenTemporal = usuarioService.generarTokenRecuperacion(email);
 

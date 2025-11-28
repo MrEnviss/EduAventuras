@@ -7,6 +7,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,133 +27,122 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> {
 
-                        // ==========================================
-                        // ARCHIVOS ESTÁTICOS DEL FRONTEND (HTML, CSS, JS, IMÁGENES)
-                        // ==========================================
-                        .requestMatchers(
+                    // ==========================================
+                    // 🔍 DEBUG: Ver qué usuario está en el contexto
+                    // ==========================================
+                    Authentication authContext = SecurityContextHolder.getContext().getAuthentication();
+                    if (authContext != null) {
+                        System.out.println("🔐 [SecurityConfig] Usuario en contexto: " + authContext.getName());
+                        System.out.println("🔐 [SecurityConfig] Authorities: " + authContext.getAuthorities());
+                    } else {
+                        System.out.println("⚠️ [SecurityConfig] NO HAY usuario en el contexto");
+                    }
 
-                                "/",
-                                "/home.html",
-                                "/login.html",
-                                "/registro.html",
-                                "/recuperar-password.html",
-                                "/materias.html",
-                                "/recursos.html",
-                                "/perfil.html",
-                                "/editar-perfil.html",
-                                "/cambiar-password.html",
-                                "/admin-dashboard.html",
-                                "/admin-materias.html",
-                                "/admin-recursos.html",
-                                "/admin-usuarios.html",
-                                "/subir-recurso.html",
-                                "/404.html",
+                    auth
+                            // ==========================================
+                            // ARCHIVOS ESTÁTICOS DEL FRONTEND
+                            // ==========================================
+                            .requestMatchers(
+                                    "/",
+                                    "/home.html",
+                                    "/login.html",
+                                    "/registro.html",
+                                    "/recuperar-password.html",
+                                    "/materias.html",
+                                    "/recursos.html",
+                                    "/perfil.html",
+                                    "/editar-perfil.html",
+                                    "/cambiar-password.html",
+                                    "/admin-dashboard.html",
+                                    "/admin-materias.html",
+                                    "/admin-recursos.html",
+                                    "/admin-usuarios.html",
+                                    "/subir-recurso.html",
+                                    "/404.html",
+                                    "/assets/**",
+                                    "/css/**",
+                                    "/js/**",
+                                    "/images/**",
+                                    "/icons/**",
+                                    "/favicon.ico"
+                            ).permitAll()
 
-                                // Recursos estáticos (CSS, JS, Imágenes)
-                                "/assets/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/icons/**",
-                                "/favicon.ico"
-                        ).permitAll()
+                            // ==========================================
+                            // SWAGGER / API DOCS
+                            // ==========================================
+                            .requestMatchers(
+                                    "/swagger-ui.html",
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**",
+                                    "/api-docs/**"
+                            ).permitAll()
 
-                        // ==========================================
-                        // SWAGGER / API DOCS
-                        // ==========================================
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/api-docs/**"
-                        ).permitAll()
+                            // ==========================================
+                            // AUTENTICACIÓN (PÚBLICO)
+                            // ==========================================
+                            .requestMatchers(
+                                    "/api/usuarios/registro",
+                                    "/api/usuarios/login"
+                            ).permitAll()
 
-                        // ==========================================
-                        // AUTENTICACIÓN (PÚBLICO)
-                        // ==========================================
-                        .requestMatchers(
-                                "/api/usuarios/registro",    // Registro de usuarios
-                                "/api/usuarios/login"        // Login (obtener JWT)
-                        ).permitAll()
+                            // ==========================================
+                            // GESTIÓN DE CONTRASEÑAS (PÚBLICO)
+                            // ==========================================
+                            .requestMatchers(
+                                    "/api/password/recuperar",
+                                    "/api/password/cambiar",
+                                    "/api/password/validar-token"
+                            ).permitAll()
 
-                        // ==========================================
-                        // GESTIÓN DE CONTRASEÑAS (PÚBLICO)
-                        // ==========================================
-                        .requestMatchers(
-                                "/api/password/recuperar",           // Solicitar recuperación
-                                "/api/password/cambiar",             // Cambiar con token
-                                "/api/password/validar-token"        // Validar token de recuperación
-                        ).permitAll()
+                            // ==========================================
+                            // 🔴 RUTAS DE ADMIN - DEBEN IR ANTES
+                            // ==========================================
+                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/usuarios").hasRole("ADMIN")
+                            .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 
-                        // ==========================================
-                        // MATERIAS (Lectura pública / Escritura ADMIN)
-                        // ==========================================
-                        .requestMatchers(HttpMethod.GET, "/api/materias/**").permitAll()        // Ver materias (público)
-                        .requestMatchers(HttpMethod.POST, "/api/materias").hasAuthority("ADMIN")       // Crear materia
-                        .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasAuthority("ADMIN")     // Editar materia
-                        .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasAuthority("ADMIN")  // Eliminar materia
+                            // ==========================================
+                            // MATERIAS
+                            // ==========================================
+                            .requestMatchers(HttpMethod.GET, "/api/materias/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/materias").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/materias/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/materias/**").hasRole("ADMIN")
 
-                        // ==========================================
-                        // RECURSOS (Lectura pública / Subida DOCENTE/ADMIN)
-                        // ==========================================
-                        .requestMatchers(HttpMethod.GET, "/api/recursos/**").permitAll()               // Ver/Descargar recursos (público)
-                        .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyAuthority("DOCENTE", "ADMIN")  // Subir PDF
-                        .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasAuthority("ADMIN")     // Editar recurso
-                        .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyAuthority("DOCENTE", "ADMIN")   // Eliminar recurso
+                            // ==========================================
+                            // RECURSOS
+                            // ==========================================
+                            .requestMatchers(HttpMethod.GET, "/api/recursos/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/recursos/subir").hasAnyRole("DOCENTE", "ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/recursos/**").hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/recursos/**").hasAnyRole("DOCENTE", "ADMIN")
 
-                        // ==========================================
-                        // PERFIL DE USUARIO (AUTENTICADO)
-                        // ==========================================
-                        .requestMatchers(
-                                "/api/perfil/usuario",              // Obtener datos del perfil
-                                "/api/perfil/actualizar",           // Actualizar datos del perfil
-                                "/api/perfil/subir-foto",           // Subir foto de perfil
-                                "/api/perfil/cambiar-password"      // Cambiar contraseña (autenticado)
-                        ).authenticated()
+                            // ==========================================
+                            // PERFIL DE USUARIO (AUTENTICADO)
+                            // ==========================================
+                            .requestMatchers(
+                                    "/api/perfil/usuario",
+                                    "/api/perfil/actualizar",
+                                    "/api/perfil/subir-foto",
+                                    "/api/perfil/cambiar-password"
+                            ).authenticated()
 
-                        // Fotos de perfil - Lectura pública
-                        .requestMatchers(HttpMethod.GET, "/api/perfil/foto/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/api/perfil/foto/**").permitAll()
 
-                        // ==========================================
-                        // DASHBOARD ADMINISTRATIVO (SOLO ADMIN)
-                        // ==========================================
-                        .requestMatchers(
-                                "/api/admin/dashboard/estadisticas",     // Estadísticas del dashboard
-                                "/api/admin/usuarios",                   // Listar usuarios
-                                "/api/admin/usuarios/**",                // Gestionar usuarios
-                                "/api/admin/reportes/**"                 // Generar reportes
-                        ).hasAuthority("ADMIN")
+                            // ==========================================
+                            // INTERNACIONALIZACIÓN (PÚBLICO)
+                            // ==========================================
+                            .requestMatchers("/api/idioma/**").permitAll()
 
-                        // ==========================================
-                        // GESTIÓN DE USUARIOS (SOLO ADMIN)
-                        // ==========================================
-                        .requestMatchers(
-                                "/api/usuarios",                         // Listar todos los usuarios
-                                "/api/usuarios/{id}",                    // Ver/Editar/Eliminar usuario específico
-                                "/api/usuarios/{id}/rol",                // Cambiar rol de usuario
-                                "/api/usuarios/{id}/estado"              // Activar/desactivar usuario
-                        ).hasAuthority("ADMIN")
-
-                        // ==========================================
-                        // REPORTES Y ESTADÍSTICAS (PÚBLICO SEGÚN NECESIDAD)
-                        // ==========================================
-                        .requestMatchers(HttpMethod.GET, "/api/reportes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/estadisticas/**").permitAll()
-
-                        // ==========================================
-                        // INTERNACIONALIZACIÓN (PÚBLICO)
-                        // ==========================================
-                        .requestMatchers("/api/idioma/**").permitAll()
-
-                        // ==========================================
-                        // CUALQUIER OTRA RUTA REQUIERE AUTENTICACIÓN
-                        // ==========================================
-                        .anyRequest().authenticated()
-                )
+                            // ==========================================
+                            // CUALQUIER OTRA RUTA REQUIERE AUTENTICACIÓN
+                            // ==========================================
+                            .anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

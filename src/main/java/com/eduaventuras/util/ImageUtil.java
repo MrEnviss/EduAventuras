@@ -119,9 +119,9 @@ public class ImageUtil {
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
             if (created) {
-                System.out.println("✅ Directorio de fotos de perfil creado: " + UPLOAD_DIR);
+                System.out.println("Directorio de fotos de perfil creado: " + UPLOAD_DIR);
             } else {
-                System.err.println("❌ No se pudo crear el directorio: " + UPLOAD_DIR);
+                System.err.println("No se pudo crear el directorio: " + UPLOAD_DIR);
             }
         }
     }
