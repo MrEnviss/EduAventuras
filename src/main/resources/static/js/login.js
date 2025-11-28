@@ -166,24 +166,29 @@ async function iniciarSesion(email, password) {
 
         // Obtener datos de la respuesta
         const data = await response.json();
-        console.log('✅ Login exitoso:', data);
+        console.log('✅ Respuesta completa del backend:', data);
 
+        // ✅ CORRECCIÓN: El backend devuelve { token, usuario: {...}, mensaje }
         // Verificar que venga el token
         if (!data.token) {
             throw new Error('No se recibió el token de autenticación');
         }
 
+        // ✅ CORRECCIÓN: Extraer datos del objeto "usuario"
+        const usuario = data.usuario || data; // Fallback por si cambia estructura
+
         // Guardar token y usuario en localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify({
-            id: data.id,
-            nombre: data.nombre,
-            email: data.email,
-            rol: data.rol
+            id: usuario.id,
+            nombre: usuario.nombre,
+            apellido: usuario.apellido || '',  // ← Ahora sí accede correctamente
+            email: usuario.email,
+            rol: usuario.rol
         }));
 
         console.log('💾 Token guardado en localStorage');
-        console.log('👤 Usuario:', data.nombre, '| Rol:', data.rol);
+        console.log(`👤 Usuario: ${usuario.nombre} ${usuario.apellido || ''} | Rol: ${usuario.rol}`);
 
         // Verificar si marcó "Recordarme"
         if (rememberMeCheckbox.checked) {
@@ -196,7 +201,7 @@ async function iniciarSesion(email, password) {
 
         // Redirigir según el rol después de 1 segundo
         setTimeout(() => {
-            redirigirSegunRol(data.rol);
+            redirigirSegunRol(usuario.rol);
         }, 1000);
 
     } catch (error) {
@@ -266,13 +271,19 @@ function cargarCredencialesRecordadas() {
 }
 
 // ===== MANEJO DE PARÁMETROS URL =====
+
 function verificarParametrosURL() {
     const params = new URLSearchParams(window.location.search);
-    const mensaje = params.get('mensaje');
+    const mensajeURL = params.get('mensaje'); // Este es el código de error (ej: error.acceso.denegado)
     const tipo = params.get('tipo') || 'info';
 
-    if (mensaje) {
-        mostrarAlerta(decodeURIComponent(mensaje), tipo);
+    if (mensajeURL) {
+
+
+        let codigoError = decodeURIComponent(mensajeURL);
+        const mensajeFinal = t(codigoError);
+
+        mostrarAlerta(mensajeFinal, tipo);
 
         // Limpiar URL sin recargar página
         window.history.replaceState({}, document.title, window.location.pathname);

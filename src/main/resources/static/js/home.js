@@ -1,5 +1,3 @@
-
-
 // ===== MAPEO DE IMÁGENES POR MATERIA =====
 const imagenesMateria = {
     'Matemáticas': 'assets/images/subjects/card-matematicas.png',
@@ -186,8 +184,7 @@ function verificarSesion() {
 
     if (token && usuario) {
         console.log('Usuario logueado:', JSON.parse(usuario));
-        // Aquí podrías cambiar el navbar para mostrar el nombre del usuario
-        // Por ejemplo: mostrar "Mi Perfil" en lugar de "Iniciar Sesión"
+
     }
 }
 
@@ -214,3 +211,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== EXPONER FUNCIÓN PARA REINTENTAR (botón de error) =====
 window.cargarMaterias = cargarMaterias;
+document.addEventListener('DOMContentLoaded', () => {
+    const btnUserDropdown = document.getElementById('btnUserDropdown');
+    const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+    // Mostrar/ocultar el dropdown de usuario
+    btnUserDropdown.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Alternar visibilidad del menú
+        const isVisible = userDropdownMenu.style.display === 'block';
+        userDropdownMenu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Cerrar el menú si se hace clic fuera del mismo
+    document.addEventListener('click', (e) => {
+        if (!btnUserDropdown.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+            userDropdownMenu.style.display = 'none';
+        }
+    });
+});

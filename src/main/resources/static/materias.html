@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explora todas las materias disponibles en EduAventuras">
+    <title>Materias - EduAventuras</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+        <link rel="icon" href="data:,">
+
+</head>
+<body>
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="home.html">
+            <img src="assets/images/Logo-Eduaventuras.svg" alt="EduAventuras" class="logo">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="home.html">Inicio</a>
+                </li>
+
+                <!-- Los items de usuario se agregan dinámicamente -->
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== HEADER DE PÁGINA ===== -->
+<section class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="page-title">Explora Nuestras Materias</h1>
+                <p class="page-subtitle">Encuentra recursos educativos de calidad en todas las áreas</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECCIÓN PRINCIPAL ===== -->
+<section class="materias-section">
+    <div class="container">
+
+        <!-- Buscador -->
+        <div class="row mb-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="search-box">
+                    <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control search-input"
+                            placeholder="🔍 Buscar materias (ej: Matemáticas, Ciencias...)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Contador de resultados -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <p id="resultadosContador" class="text-muted"></p>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingMaterias" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Cargando materias...</span>
+            </div>
+            <p class="mt-3">Cargando materias disponibles...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorMaterias" class="alert alert-danger d-none" role="alert">
+            <h4 class="alert-heading">⚠️ Error al cargar materias</h4>
+            <p>No se pudieron cargar las materias. Por favor, verifica que el servidor esté corriendo.</p>
+            <hr>
+            <button class="btn btn-outline-danger" onclick="cargarMaterias()">
+                🔄 Reintentar
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyMaterias" class="text-center py-5 d-none">
+            <img src="assets/images/empty-states/sin_recursos.png"
+                 alt="Sin materias"
+                 class="empty-state-image mb-4"
+                 style="max-width: 300px; opacity: 0.6;">
+            <h3>No hay materias disponibles</h3>
+            <p class="text-muted">Aún no se han agregado materias al sistema.</p>
+        </div>
+
+        <!-- No results State -->
+        <div id="noResultsMaterias" class="text-center py-5 d-none">
+            <img src="assets/images/empty-states/sin_resultados.png"
+                 alt="Sin resultados"
+                 class="empty-state-image mb-4"
+                 style="max-width: 250px; opacity: 0.6;">
+            <h3>No se encontraron resultados</h3>
+            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        </div>
+
+        <!-- Grid de Materias -->
+        <div id="materiasGrid" class="row g-4">
+            <!-- Las materias se cargarán dinámicamente aquí -->
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>EduAventuras</h5>
+                <p>Plataforma educativa gratuita dedicada a brindar recursos de calidad para estudiantes.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Enlaces</h5>
+                <ul>
+                    <li><a href="home.html">Inicio</a></li>
+                    <li><a href="materias.html">Materias</a></li>
+                    <li><a href="login.html">Iniciar Sesión</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5>Materias Populares</h5>
+                <ul>
+                    <li><a href="#">Matemáticas</a></li>
+                    <li><a href="#">Ciencias</a></li>
+                    <li><a href="#">Español</a></li>
+                    <li><a href="#">Historia</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5>Contacto</h5>
+                <ul>
+                    <li><a href="mailto:info@eduaventuras.com">info@eduaventuras.com</a></li>
+                    <li><a href="#">Soporte</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 EduAventuras. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Módulo de autenticación -->
+<script src="js/auth.js"></script>
+
+<!-- Script de esta página -->
+<script src="js/materias.js"></script>
+
+</body>
+</html>
