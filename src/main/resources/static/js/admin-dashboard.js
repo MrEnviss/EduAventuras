@@ -30,9 +30,9 @@ async function cargarEstadisticas() {
 
         // 🔴 CRÍTICO: Extraer datos de la estructura correcta
         const totalUsuarios = stats.usuarios?.totalUsuarios || stats.totalUsuarios || 0;
-        const totalMaterias = stats.contenido?.totalMaterias || stats.totalMaterias || 0;
-        const totalRecursos = stats.contenido?.totalRecursos || stats.totalRecursos || 0;
-        const totalDescargas = stats.contenido?.totalDescargas || stats.totalDescargas || 0;
+        const totalMaterias = stats.materias?.totalMaterias || stats.totalMaterias || 0;
+        const totalRecursos = stats.recursos?.totalRecursos || stats.totalRecursos || 0;
+        const totalDescargas = stats.descargas?.totalDescargas || stats.totalDescargas || 0;
 
         console.log('📊 Valores extraídos:', {
             totalUsuarios,
@@ -90,10 +90,20 @@ async function cargarEstadisticas() {
             });
             console.log('📊 Generando gráfico de recursos con:', recursosPorMateria);
             generarGraficoRecursos(recursosPorMateria);
+        } else if (stats.contenido?.recursosPorMateria) {
+            // Alternativa: usar contenido.recursosPorMateria si existe
+            console.log('📊 Generando gráfico de recursos desde contenido:', stats.contenido.recursosPorMateria);
+            generarGraficoRecursos(stats.contenido.recursosPorMateria);
+        } else {
+            console.warn('⚠️ No hay datos de recursos por materia');
         }
 
         // Cargar actividad reciente desde el resumen
-        await cargarActividadReciente();
+        if (stats.recursosRecientes && stats.recursosRecientes.length > 0) {
+            mostrarActividadReciente(stats.recursosRecientes);
+        } else {
+            await cargarActividadReciente();
+        }
 
         // Mostrar contenido
         document.getElementById('loadingDashboard').style.display = 'none';
@@ -168,6 +178,38 @@ async function cargarEstadisticasAlternativas() {
     // Mostrar contenido
     document.getElementById('loadingDashboard').style.display = 'none';
     document.getElementById('dashboardContent').style.display = 'block';
+}
+
+// ===== MOSTRAR ACTIVIDAD RECIENTE =====
+function mostrarActividadReciente(recursosRecientes) {
+    const activityList = document.getElementById('activityList');
+
+    if (recursosRecientes && recursosRecientes.length > 0) {
+        activityList.innerHTML = recursosRecientes.map(recurso => {
+            const fecha = new Date(recurso.fechaSubida);
+            const tiempoRelativo = obtenerTiempoRelativo(fecha);
+
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon">📄</div>
+                    <div class="activity-content">
+                        <div class="activity-title">
+                            Nuevo recurso: ${recurso.titulo}
+                        </div>
+                        <div class="activity-time">
+                            Subido por ${recurso.subidoPorNombre} • ${tiempoRelativo}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        activityList.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <p>No hay actividad reciente</p>
+            </div>
+        `;
+    }
 }
 
 // ===== CARGAR ACTIVIDAD RECIENTE DESDE RESUMEN =====
