@@ -2,11 +2,11 @@
 
 :root {
     --primary: #0d5957;
-    --secondary: #F4C430;
+    --secondary: #ffffff;
     --accent: #000000;
     --dark: #2C3E50;
     --light: #F8F9FA;
-    --white: #FFFFFF;
+    --white: #ffffff;
     --danger: #ef4444;
     --success: #22c55e;
 }
@@ -199,7 +199,7 @@ textarea.form-control {
 
 .form-hint {
     font-size: 0.8rem;
-    color: #666;
+    color: #000000;
     margin-top: 0.4rem;
 }
 
@@ -248,7 +248,7 @@ textarea.form-control {
 }
 
 .upload-text {
-    color: #666;
+    color: #000000;
     margin-bottom: 1.25rem;
     line-height: 1.5;
     font-size: 0.95rem;
@@ -280,7 +280,7 @@ textarea.form-control {
 .upload-hint {
     margin-top: 0.75rem;
     font-size: 0.8rem;
-    color: #999;
+    color: #000000;
 }
 
 /* File Preview */

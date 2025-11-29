@@ -424,40 +424,7 @@ async function descargarReporte() {
     }
 }
 
-// ===== DESCARGAR REPORTE DE MATERIA ESPECÍFICA =====
-async function descargarReporteMateria(materiaId, materiaNombre) {
-    try {
-        console.log(`📊 Descargando reporte de materia ${materiaId}...`);
 
-        const response = await window.fetchAutenticado(`${API_URL}/reportes/materia/${materiaId}/descargar`);
-
-        if (!response.ok) {
-            throw new Error('Error al generar el reporte de la materia');
-        }
-
-        const blob = await response.blob();
-
-        const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
-        const nombreArchivo = `Reporte-${materiaNombre}-${fecha}.pdf`;
-
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = nombreArchivo;
-        document.body.appendChild(a);
-        a.click();
-
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        console.log('✅ Reporte de materia descargado exitosamente');
-        alert(`✅ Reporte de ${materiaNombre} descargado exitosamente`);
-
-    } catch (error) {
-        console.error('❌ Error al descargar reporte de materia:', error);
-        alert('❌ Error al generar el reporte: ' + error.message);
-    }
-}
 
 // ===== CERRAR MODALES AL HACER CLIC FUERA =====
 document.addEventListener('click', (e) => {
@@ -482,6 +449,5 @@ window.toggleEstadoUsuario = toggleEstadoUsuario;
 window.confirmarEliminarUsuario = confirmarEliminarUsuario;
 window.cerrarConfirmacion = cerrarConfirmacion;
 window.descargarReporte = descargarReporte;
-window.descargarReporteMateria = descargarReporteMateria;
 
 console.log('✅ Módulo de gestión de usuarios cargado (v2.1 - Con reportes PDF)');
