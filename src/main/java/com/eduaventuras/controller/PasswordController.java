@@ -22,9 +22,14 @@ public class PasswordController {
      * Cambiar contraseña (usuario logueado)
      */
     @PostMapping("/cambiar")
-    public ResponseEntity<?> cambiarPassword(@Valid @RequestBody CambiarPasswordDTO dto) {
+    public ResponseEntity<?> cambiarPassword(@RequestBody Map<String, String> request) {
         try {
-            usuarioService.cambiarPassword(dto.getEmail(), dto.getPasswordActual(), dto.getPasswordNueva());
+            String email = request.get("email");
+            String passwordActual = request.get("passwordActual");
+            String passwordNueva = request.get("passwordNueva");
+
+            usuarioService.cambiarPassword(email, passwordActual, passwordNueva);
+
             return ResponseEntity.ok(Map.of(
                     "mensaje", "Contraseña actualizada exitosamente"
             ));
@@ -36,32 +41,85 @@ public class PasswordController {
     }
 
     /**
-     * POST /api/password/solicitar-recuperacion
-     * Solicitar recuperación de contraseña (recibe email)
-     * NOTA: Por ahora solo valida que el email exista
-     * En producción enviaría un email con token
+     * POST /api/password/recuperar
+     * Solicitar recuperación de contraseña (genera token)
      */
-    @PostMapping("/solicitar-recuperacion")
+    @PostMapping("/recuperar")
     public ResponseEntity<?> solicitarRecuperacion(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
 
-            // Verificar que el email existe
-            usuarioService.verificarEmailExiste(email);
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "El email es requerido"));
+            }
 
-            // Por ahora solo generamos un token temporal
-            String tokenTemporal = usuarioService.generarTokenRecuperacion(email);
+            // Verificar que el email existe (sin revelar si existe o no)
+            String token = null;
+            try {
+                usuarioService.verificarEmailExiste(email);
+                token = usuarioService.generarTokenRecuperacion(email);
+                System.out.println("🔑 Token generado para: " + email);
+            } catch (Exception e) {
+                // Por seguridad, no revelar si el email existe
+            }
 
-            return ResponseEntity.ok(Map.of(
-                    "mensaje", "Si el email existe, recibirás instrucciones para recuperar tu contraseña",
-                    "token_temporal", tokenTemporal, // Solo para desarrollo, ELIMINAR en producción
-                    "nota", "En producción este token se enviará por email"
-            ));
+            // Respuesta genérica (por seguridad)
+            Map<String, Object> response = Map.of(
+                    "mensaje", "Si el email existe, recibirás un enlace de recuperación"
+            );
+
+            // Solo para testing - EN PRODUCCIÓN ELIMINAR ESTO
+            if (token != null) {
+                String enlace = "http://localhost:8080/recuperar-password.html?token=" + token;
+                return ResponseEntity.ok(Map.of(
+                        "mensaje", "Si el email existe, recibirás un enlace de recuperación",
+                        "token", token,  // Solo para testing
+                        "enlace", enlace // Solo para testing
+                ));
+            }
+
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             // Por seguridad, siempre devolver el mismo mensaje
             return ResponseEntity.ok(Map.of(
-                    "mensaje", "Si el email existe, recibirás instrucciones para recuperar tu contraseña"
+                    "mensaje", "Si el email existe, recibirás un enlace de recuperación"
             ));
+        }
+    }
+
+    /**
+     * POST /api/password/validar-token
+     * Validar que el token de recuperación es válido
+     */
+    @PostMapping("/validar-token")
+    public ResponseEntity<?> validarToken(@RequestBody Map<String, String> request) {
+        try {
+            String token = request.get("token");
+
+            if (token == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Token requerido"));
+            }
+
+            // Validar token usando el método del servicio
+            boolean valido = usuarioService.validarTokenRecuperacion(token);
+
+            if (valido) {
+                String email = usuarioService.obtenerEmailPorToken(token);
+                return ResponseEntity.ok(Map.of(
+                        "valido", true,
+                        "email", email
+                ));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Token inválido o expirado"));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Token inválido o expirado"));
         }
     }
 
@@ -73,9 +131,20 @@ public class PasswordController {
     public ResponseEntity<?> restablecerPassword(@RequestBody Map<String, String> request) {
         try {
             String token = request.get("token");
+            String password = request.get("password");
             String nuevaPassword = request.get("nuevaPassword");
 
-            usuarioService.restablecerPasswordConToken(token, nuevaPassword);
+            // Aceptar tanto 'password' como 'nuevaPassword'
+            String passwordFinal = password != null ? password : nuevaPassword;
+
+            if (token == null || passwordFinal == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Token y contraseña son requeridos"));
+            }
+
+            usuarioService.restablecerPasswordConToken(token, passwordFinal);
+
+            System.out.println("✅ Contraseña restablecida exitosamente");
 
             return ResponseEntity.ok(Map.of(
                     "mensaje", "Contraseña restablecida exitosamente. Ya puedes iniciar sesión."

@@ -34,8 +34,8 @@ public class SecurityConfig {
                     // ==========================================
                     Authentication authContext = SecurityContextHolder.getContext().getAuthentication();
                     if (authContext != null) {
-                        System.out.println("🔐 [SecurityConfig] Usuario en contexto: " + authContext.getName());
-                        System.out.println("🔐 [SecurityConfig] Authorities: " + authContext.getAuthorities());
+                        System.out.println("🔍 [SecurityConfig] Usuario en contexto: " + authContext.getName());
+                        System.out.println("🔍 [SecurityConfig] Authorities: " + authContext.getAuthorities());
                     } else {
                         System.out.println("⚠️ [SecurityConfig] NO HAY usuario en el contexto");
                     }
@@ -94,8 +94,9 @@ public class SecurityConfig {
                             // ==========================================
                             .requestMatchers(
                                     "/api/password/recuperar",
-                                    "/api/password/cambiar",
-                                    "/api/password/validar-token"
+                                    "/api/password/validar-token",
+                                    "/api/password/restablecer",  // ✅ AGREGADO
+                                    "/api/password/cambiar"
                             ).permitAll()
 
                             // ==========================================
@@ -125,13 +126,26 @@ public class SecurityConfig {
                             // PERFIL DE USUARIO (AUTENTICADO)
                             // ==========================================
                             .requestMatchers(
-                                    "/api/perfil/usuario",
-                                    "/api/perfil/actualizar",
-                                    "/api/perfil/subir-foto",
-                                    "/api/perfil/cambiar-password"
+                                    HttpMethod.GET, "/api/perfil"
                             ).authenticated()
 
-                            .requestMatchers(HttpMethod.GET, "/api/perfil/foto/**").permitAll()
+                            .requestMatchers(
+                                    HttpMethod.PUT, "/api/perfil/actualizar"
+                            ).authenticated()
+
+                            // ✅ CORRECCIÓN: POST /api/perfil/foto DEBE ser autenticado
+                            .requestMatchers(
+                                    HttpMethod.POST, "/api/perfil/foto"
+                            ).authenticated()
+
+                            // DELETE /api/perfil/foto (eliminar mi foto) DEBE ser autenticado
+                            .requestMatchers(
+                                    HttpMethod.DELETE, "/api/perfil/foto"
+                            ).authenticated()
+
+                            // ✅ CORRECCIÓN: Foto pública. Permitir GET y HEAD (implícito con permitAll)
+                            .requestMatchers("/api/perfil/foto/**").permitAll()
+
 
                             // ==========================================
                             // INTERNACIONALIZACIÓN (PÚBLICO)
