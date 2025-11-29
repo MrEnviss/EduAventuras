@@ -1,33 +1,43 @@
 package com.eduaventuras.service;
 
-
 import com.eduaventuras.dto.ActualizarPerfilDTO;
 import com.eduaventuras.dto.LoginDTO;
 import com.eduaventuras.dto.RegistroDTO;
 import com.eduaventuras.dto.UsuarioDTO;
+import com.eduaventuras.model.Materia;
 import com.eduaventuras.model.Rol;
 import com.eduaventuras.model.Usuario;
+import com.eduaventuras.repository.MateriaRepository;
 import com.eduaventuras.repository.UsuarioRepository;
 import com.eduaventuras.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
 public class UsuarioService {
+    @Autowired
+    private MateriaRepository materiaRepository;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Value("${app.upload.dir:uploads/}")
+    private String uploadDir;
+
     // Almacenamiento temporal de tokens de recuperación (en producción usar Redis o BD)
-    private  Map<String, TokenRecuperacion> tokensRecuperacion = new HashMap<>();
+    private Map<String, TokenRecuperacion> tokensRecuperacion = new HashMap<>();
+
     /**
      * Buscar usuario por email
      */
@@ -45,51 +55,88 @@ public class UsuarioService {
      * Actualizar perfil (nombre y apellido)
      */
     public UsuarioDTO actualizarPerfil(String email, ActualizarPerfilDTO dto) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-        if (usuarioOpt.isEmpty()) {
-            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
-        }
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Usuario usuario = usuarioOpt.get();
+        // Actualizar campos básicos
         usuario.setNombre(dto.getNombre());
         usuario.setApellido(dto.getApellido());
-        usuarioRepository.save(usuario);
 
-        return convertirADTO(usuario);
+        // Actualizar biografía
+        usuario.setBiografia(dto.getBiografia());
+
+        // Actualizar materia favorita
+        if (dto.getMateriaFavoritaId() != null) {
+            Materia materiaFavorita = materiaRepository.findById(dto.getMateriaFavoritaId())
+                    .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+            usuario.setMateriaFavorita(materiaFavorita);
+        } else {
+            usuario.setMateriaFavorita(null);
+        }
+
+        usuario.setUltimaActualizacion(LocalDateTime.now());
+        Usuario actualizado = usuarioRepository.save(usuario);
+        return convertirADTO(actualizado);
     }
 
     /**
-     * Subir foto de perfil
+     * Actualizar la foto de perfil del usuario
      */
-    public String subirFotoPerfil(String email, MultipartFile foto) throws IOException {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-        if (usuarioOpt.isEmpty()) {
-            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
-        }
+    public void actualizarFotoPerfil(String email, String rutaFoto) throws Exception {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("Usuario no encontrado"));
 
-        Usuario usuario = usuarioOpt.get();
-
-        // Crear directorio uploads si no existe
-        String rutaDirectorio = "uploads/";
-        File directorio = new File(rutaDirectorio);
-        if (!directorio.exists()) {
-            directorio.mkdirs();
-        }
-
-        String nombreArchivo = email + "_" + foto.getOriginalFilename();
-        String rutaCompleta = rutaDirectorio + nombreArchivo;
-
-        File archivo = new File(rutaCompleta);
-        foto.transferTo(archivo);
-
-        usuario.setFotoPerfil(rutaCompleta);
+        usuario.setFoto(rutaFoto);
         usuarioRepository.save(usuario);
 
-        return usuario.getFotoPerfil();
+        System.out.println("✅ Foto actualizada para: " + email + " -> " + rutaFoto);
     }
 
     /**
-     * Obtener foto de perfil (como byte[])
+     * Obtener la ruta de la foto del usuario por ID
+     */
+    public String obtenerRutaFotoPerfil(Long usuarioId) {
+        try {
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElse(null);
+
+            if (usuario == null) {
+                System.out.println("⚠️ Usuario no encontrado: " + usuarioId);
+                return null;
+            }
+
+            System.out.println("📸 Foto del usuario " + usuarioId + ": " + usuario.getFoto());
+            return usuario.getFoto();
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al obtener ruta de foto: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Obtener la ruta de la foto del usuario por email
+     */
+    public String obtenerRutaFotoDelEmail(String email) {
+        try {
+            Usuario usuario = usuarioRepository.findByEmail(email)
+                    .orElse(null);
+
+            if (usuario == null) {
+                System.out.println("⚠️ Usuario no encontrado: " + email);
+                return null;
+            }
+
+            return usuario.getFoto();
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al obtener ruta de foto: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Obtener foto de perfil (como byte[]) - Mantener para compatibilidad
      */
     public byte[] obtenerFotoPerfil(Long usuarioId) throws IOException {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
@@ -98,38 +145,44 @@ public class UsuarioService {
         }
 
         Usuario usuario = usuarioOpt.get();
-        if (usuario.getFotoPerfil() == null) {
-            throw new IllegalArgumentException("El usuario no tiene una foto de perfil");
+        if (usuario.getFoto() == null || usuario.getFoto().isEmpty()) {
+            return new byte[0];
         }
 
-        File archivo = new File(usuario.getFotoPerfil());
-        if (!archivo.exists()) {
+        // Construir ruta del archivo
+        String nombreArchivo = usuario.getFoto().replace("/uploads/", "").replace("uploads/", "");
+        Path filePath = Paths.get(uploadDir).resolve(nombreArchivo);
+
+        if (!Files.exists(filePath)) {
             throw new IllegalArgumentException("No se encontró la foto de perfil");
         }
 
-        return java.nio.file.Files.readAllBytes(archivo.toPath());
+        return Files.readAllBytes(filePath);
     }
 
     /**
      * Eliminar foto de perfil
      */
-    public void eliminarFotoPerfil(String email) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-        if (usuarioOpt.isEmpty()) {
-            throw new IllegalArgumentException("Usuario no encontrado con el email: " + email);
+    public void eliminarFotoPerfil(String email) throws IOException {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (usuario.getFoto() != null && !usuario.getFoto().isEmpty()) {
+            // Eliminar archivo físico
+            String nombreArchivo = usuario.getFoto().replace("/uploads/", "").replace("uploads/", "");
+            Path filePath = Paths.get(uploadDir).resolve(nombreArchivo);
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                System.out.println("✅ Archivo eliminado: " + filePath.toAbsolutePath());
+            }
+
+            // Actualizar usuario
+            usuario.setFoto(null);
+            usuarioRepository.save(usuario);
         }
 
-        Usuario usuario = usuarioOpt.get();
-        if (usuario.getFotoPerfil() != null) {
-            File archivo = new File(usuario.getFotoPerfil());
-            if (archivo.exists()) {
-                archivo.delete();
-            }
-            usuario.setFotoPerfil(null);
-            usuarioRepository.save(usuario);
-        } else {
-            throw new IllegalArgumentException("El usuario no tiene una foto de perfil para eliminar");
-        }
+        System.out.println("✅ Foto de perfil eliminada para: " + email);
     }
 
     /**
@@ -214,8 +267,6 @@ public class UsuarioService {
 
         tokensRecuperacion.put(token, tokenRecuperacion);
 
-        
-
         return token;
     }
 
@@ -283,6 +334,9 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    /**
+     * Eliminar usuario permanentemente
+     */
     public void eliminarPermanente(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -318,6 +372,7 @@ public class UsuarioService {
     }
 
     /**
+     * Desactivar usuario
      */
     public void desactivar(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
@@ -325,6 +380,7 @@ public class UsuarioService {
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
     }
+
     /**
      * Contar usuarios por rol
      */
@@ -349,9 +405,31 @@ public class UsuarioService {
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
+    public boolean validarTokenRecuperacion(String token) {
+        TokenRecuperacion tokenRecuperacion = tokensRecuperacion.get(token);
+
+        if (tokenRecuperacion == null) {
+            return false;
+        }
+
+        // Verificar que no haya expirado
+        if (LocalDateTime.now().isAfter(tokenRecuperacion.getFechaExpiracion())) {
+            tokensRecuperacion.remove(token);
+            return false;
+        }
+
+        return true;
+    }
 
     /**
-     * Convertir entidad a DTO
+     * Obtener email asociado a un token
+     */
+    public String obtenerEmailPorToken(String token) {
+        TokenRecuperacion tokenRecuperacion = tokensRecuperacion.get(token);
+        return tokenRecuperacion != null ? tokenRecuperacion.getEmail() : null;
+    }
+    /**
+     * Convertir entidad Usuario a DTO
      */
     private UsuarioDTO convertirADTO(Usuario usuario) {
         UsuarioDTO dto = new UsuarioDTO();
@@ -362,6 +440,20 @@ public class UsuarioService {
         dto.setRol(usuario.getRol());
         dto.setFechaRegistro(usuario.getFechaRegistro());
         dto.setActivo(usuario.getActivo());
+
+        // ✅ NUEVOS CAMPOS - IMPORTANTE!
+        dto.setFoto(usuario.getFoto());  // ← ESTO ES LO QUE FALTABA
+        dto.setBiografia(usuario.getBiografia());
+        dto.setUltimaActualizacion(usuario.getUltimaActualizacion());
+
+        // Materia favorita
+        if (usuario.getMateriaFavorita() != null) {
+            dto.setMateriaFavoritaId(usuario.getMateriaFavorita().getId());
+            dto.setMateriaFavoritaNombre(usuario.getMateriaFavorita().getNombre());
+        }
+
+        System.out.println("✅ DTO creado - Foto: " + dto.getFoto());
+
         return dto;
     }
 

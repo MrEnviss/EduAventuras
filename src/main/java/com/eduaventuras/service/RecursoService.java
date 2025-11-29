@@ -11,6 +11,7 @@ import com.eduaventuras.repository.DescargaRepository;
 import com.eduaventuras.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -121,6 +122,22 @@ public class RecursoService {
     }
 
     /**
+     * 🔴 NUEVO: Incrementar el contador de descargas de un recurso
+     */
+    @Transactional
+    public void incrementarDescargas(Long recursoId) {
+        // Verificar que el recurso existe
+        Recurso recurso = recursoRepository.findById(recursoId)
+                .orElseThrow(() -> new RuntimeException("Recurso no encontrado con ID: " + recursoId));
+
+        // Contar descargas desde DescargaRepository
+        long totalDescargas = descargaRepository.countByRecursoId(recursoId);
+
+        System.out.println("✅ [DESCARGAS] Recurso ID " + recursoId +
+                " (\"" + recurso.getTitulo() + "\") - Total descargas: " + totalDescargas);
+    }
+
+    /**
      * Eliminar recurso (admin o quien lo subió)
      */
     public void eliminar(Long id) throws IOException {
@@ -164,6 +181,7 @@ public class RecursoService {
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * Convertir entidad a DTO

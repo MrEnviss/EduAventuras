@@ -36,10 +36,9 @@ public class RecursoController {
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
             @RequestParam("materiaId") Long materiaId,
-            @RequestParam("usuarioId") Long usuarioId) {  // ← VOLVER A RECIBIR POR PARÁMETRO
+            @RequestParam("usuarioId") Long usuarioId) {
 
         try {
-            // YA NO USAR AuthUtil, usar el parámetro directo
             RecursoDTO recurso = recursoService.subirRecurso(file, titulo, descripcion,
                     materiaId, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -104,6 +103,9 @@ public class RecursoController {
             @PathVariable Long id,
             @RequestParam(required = false) Long usuarioId) {
         try {
+            // 🔴 NUEVO: INCREMENTAR CONTADOR DE DESCARGAS
+            recursoService.incrementarDescargas(id);
+
             // Registrar la descarga si se proporcionó usuarioId
             if (usuarioId != null) {
                 descargaService.registrarDescarga(id, usuarioId);

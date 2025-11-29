@@ -82,12 +82,6 @@ public class MateriaService {
         Materia materia = materiaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
 
-        // ✅ CORREGIDO: Verificar que no tenga recursos ACTIVOS asociados
-        long cantidadRecursosActivos = recursoRepository.countByMateriaIdAndActivo(id, true);
-        if (cantidadRecursosActivos > 0) {
-            throw new RuntimeException("No se puede eliminar una materia con recursos activos asociados. " +
-                    "Primero elimina los " + cantidadRecursosActivos + " recursos.");
-        }
 
         materia.setActivo(false);
         materiaRepository.save(materia);

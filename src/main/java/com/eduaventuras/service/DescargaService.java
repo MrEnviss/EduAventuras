@@ -85,14 +85,14 @@ public class DescargaService {
     public List<Map<String, Object>> obtenerRecursosMasDescargados(int limite) {
         List<Descarga> todasLasDescargas = descargaRepository.findAll();
 
-        // **CORRECCIÓN ROBUSTA:** Filtro con try-catch para evitar errores de Lazy Loading
+        // **FILTRO ROBUSTO Y CORREGIDO:** Usa try-catch para capturar el error de Lazy Loading
         Map<Long, Long> conteoPorRecurso = todasLasDescargas.stream()
                 .filter(d -> {
                     try {
-                        // Forzar la inicialización de la entidad y chequear por nulos
+                        // Acceder al ID del recurso forzará la inicialización. Si falla, descartamos.
                         return d.getRecurso() != null && d.getRecurso().getId() != null;
                     } catch (Exception e) {
-                        // Capturar excepción de entidad no encontrada y descartar la descarga.
+                        // Captura la EntityNotFoundException (la causa del error 400)
                         return false;
                     }
                 })
@@ -129,7 +129,7 @@ public class DescargaService {
         return descargaRepository.findAll().stream()
                 .filter(d -> {
                     try {
-                        // **CORRECCIÓN ROBUSTA:** Forzar la inicialización y chequear Recurso y Usuario
+                        // **FILTRO ROBUSTO Y CORREGIDO:** Chequeo completo para Recurso y Usuario
                         return d.getRecurso() != null && d.getUsuario() != null &&
                                 d.getRecurso().getId() != null && d.getUsuario().getId() != null;
                     } catch (Exception e) {
@@ -155,12 +155,12 @@ public class DescargaService {
      */
     public List<Map<String, Object>> obtenerConteoRecursosPorMateria() {
         // Obtenemos solo las materias activas
-        List<Materia> materias = materiaRepository.findByActivo(true);
+        List<Materia> materias = materiaRepository.findByActivo(true); // Requiere MateriaRepository.java
 
         return materias.stream()
                 .map(materia -> {
                     // Contamos los recursos activos por el ID de la materia
-                    long conteo = recursoRepository.countByMateriaId(materia.getId());
+                    long conteo = recursoRepository.countByMateriaId(materia.getId()); // Requiere RecursoRepository.java
 
                     Map<String, Object> info = new HashMap<>();
                     info.put("nombreMateria", materia.getNombre());
