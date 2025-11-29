@@ -1,0 +1,134 @@
+/* ===== I18N.CSS - ESTILOS SELECTOR DE IDIOMA ===== */
+
+.language-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.language-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    color: #475569;
+}
+
+.language-btn:hover {
+    border-color: #14b8a6;
+    background: #f0fdfa;
+}
+
+.language-btn .flag {
+    font-size: 1.25rem;
+}
+
+.language-btn .lang-name {
+    font-weight: 500;
+}
+
+.language-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.language-btn:hover svg {
+    transform: translateY(2px);
+}
+
+.language-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(20, 184, 166, 0.15);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    min-width: 160px;
+}
+
+.language-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    color: #475569;
+    text-align: left;
+}
+
+.language-option:hover {
+    background: #f0fdfa;
+    color: #14b8a6;
+}
+
+.language-option.active {
+    background: #f0fdfa;
+    color: #14b8a6;
+    font-weight: 600;
+}
+
+.language-option .flag {
+    font-size: 1.25rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 576px) {
+    .language-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .language-btn .lang-name {
+        display: none;
+    }
+
+    .language-dropdown {
+        right: 0;
+        left: auto;
+    }
+}
+
+/* ===== NAVBAR INTEGRATION ===== */
+.navbar .language-selector {
+    margin-left: 1rem;
+}
+
+/* ===== ANIMACIÓN DE CARGA ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.language-selector {
+    animation: fadeIn 0.3s ease;
+}

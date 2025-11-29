@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/admin-materias.css">
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
 
@@ -29,20 +31,24 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 <li class="nav-item">
-                    <a class="nav-link" href="home.html">Inicio</a>
+                    <a class="nav-link" href="home.html" data-i18n="navbar.inicio">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="materias.html">Materias</a>
+                    <a class="nav-link" href="materias.html" data-i18n="navbar.materias">Materias</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="admin-dashboard.html">Dashboard</a>
                 </li>
-    
+
                 <li class="nav-item nav-authenticated" style="display: none;">
                     <span class="navbar-text" id="navbarUserName"></span>
                 </li>
+                <!-- Selector de idioma -->
+                <li class="nav-item">
+                    <div id="selector-idioma"></div>
+                </li>
                 <li class="nav-item nav-authenticated" style="display: none;">
-                    <button onclick="logout()" class="btn btn-outline-danger">
+                    <button onclick="logout()" class="btn btn-outline-danger" data-i18n="navbar.cerrarSesion">
                         Cerrar Sesión
                     </button>
                 </li>
@@ -57,14 +63,14 @@
     <!-- Header -->
     <div class="page-header">
         <div class="header-content">
-            <h1>📚 Gestión de Materias</h1>
-            <p>Administra las materias disponibles en la plataforma</p>
+            <h1 data-i18n="materias.gestion">📚 Gestión de Materias</h1>
+            <p data-i18n="materias.administrar">Administra las materias disponibles en la plataforma</p>
         </div>
         <button id="btnNuevaMateria" class="btn-nueva-materia">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 5v14M5 12h14"/>
             </svg>
-            Nueva Materia
+            <span data-i18n="materias.nueva">Nueva Materia</span>
         </button>
     </div>
 
@@ -74,6 +80,7 @@
             <input
                     type="text"
                     id="searchInput"
+                    data-i18n="placeholder:materias.buscar"
                     placeholder="Buscar materias por nombre o descripción..."
                     autocomplete="off"
             >
@@ -83,22 +90,22 @@
             </svg>
         </div>
         <div class="filter-info">
-            <span id="totalMaterias">0</span> materias en total
+            <span id="totalMaterias">0</span> <span data-i18n="materias.total">materias en total</span>
         </div>
     </div>
 
     <!-- Loading State -->
     <div id="loadingMaterias" class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando materias...</p>
+        <p data-i18n="materias.cargando">Cargando materias...</p>
     </div>
 
     <!-- Empty State -->
     <div id="emptyState" class="empty-state" style="display: none;">
         <img src="assets/images/empty-states/sin_recursos.png" alt="Sin materias">
-        <h3>No hay materias registradas</h3>
-        <p>Comienza agregando tu primera materia</p>
-        <button onclick="abrirModalNueva()" class="btn-cta">
+        <h3 data-i18n="materias.sinMaterias">No hay materias registradas</h3>
+        <p data-i18n="materias.comenzar">Comienza agregando tu primera materia</p>
+        <button onclick="abrirModalNueva()" class="btn-cta" data-i18n="materias.crearPrimera">
             Crear Primera Materia
         </button>
     </div>
@@ -109,11 +116,11 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th class="text-center">Recursos</th>
-                    <th class="text-center">Acciones</th>
+                    <th data-i18n="materias.imagen">Imagen</th>
+                    <th data-i18n="materias.nombre">Nombre</th>
+                    <th data-i18n="materias.descripcion">Descripción</th>
+                    <th class="text-center" data-i18n="materias.recursos">Recursos</th>
+                    <th class="text-center" data-i18n="materias.acciones">Acciones</th>
                 </tr>
                 </thead>
                 <tbody id="materiasTableBody">
@@ -130,7 +137,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Nueva Materia</h3>
+                <h3 id="modalTitle" data-i18n="materias.nuevaMateria">Nueva Materia</h3>
                 <button type="button" class="btn-close" onclick="cerrarModal()">×</button>
             </div>
             <div class="modal-body">
@@ -138,11 +145,12 @@
                     <input type="hidden" id="materiaId">
 
                     <div class="form-group">
-                        <label for="nombre">Nombre de la Materia *</label>
+                        <label for="nombre" data-i18n="materias.nombreLabel">Nombre de la Materia *</label>
                         <input
                                 type="text"
                                 id="nombre"
                                 class="form-control"
+                                data-i18n="placeholder:materias.nombrePlaceholder"
                                 placeholder="Ej: Matemáticas"
                                 required
                                 maxlength="100"
@@ -150,37 +158,38 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="descripcion">Descripción *</label>
+                        <label for="descripcion" data-i18n="materias.descripcionLabel">Descripción *</label>
                         <textarea
                                 id="descripcion"
                                 class="form-control"
                                 rows="4"
+                                data-i18n="placeholder:materias.descripcionPlaceholder"
                                 placeholder="Describe brevemente el contenido de esta materia..."
                                 required
                                 maxlength="500"
                         ></textarea>
-                        <small class="form-text">Máximo 500 caracteres</small>
+                        <small class="form-text" data-i18n="materias.maxCaracteres">Máximo 500 caracteres</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="imagenUrl">URL de la Imagen</label>
+                        <label for="imagenUrl" data-i18n="materias.imagenUrl">URL de la Imagen</label>
                         <input
                                 type="url"
                                 id="imagenUrl"
                                 class="form-control"
                                 placeholder="https://ejemplo.com/imagen.jpg"
                         >
-                        <small class="form-text">Deja vacío para usar la imagen por defecto</small>
+                        <small class="form-text" data-i18n="materias.imagenHint">Deja vacío para usar la imagen por defecto</small>
                     </div>
 
                     <div id="alertModal" class="alert" style="display: none;"></div>
 
                     <div class="modal-actions">
-                        <button type="button" class="btn-secondary" onclick="cerrarModal()">
+                        <button type="button" class="btn-secondary" onclick="cerrarModal()" data-i18n="materias.cancelar">
                             Cancelar
                         </button>
                         <button type="submit" class="btn-primary" id="btnGuardar">
-                            <span id="btnGuardarText">Guardar</span>
+                            <span id="btnGuardarText" data-i18n="materias.guardar">Guardar</span>
                             <span id="btnGuardarSpinner" class="spinner-small" style="display: none;"></span>
                         </button>
                     </div>
@@ -195,18 +204,18 @@
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>⚠️ Confirmar Eliminación</h3>
+                <h3 data-i18n="materias.confirmarEliminar">⚠️ Confirmar Eliminación</h3>
             </div>
             <div class="modal-body">
-                <p>¿Estás seguro de eliminar esta materia?</p>
-                <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
-                <p class="text-muted">Se eliminarán también todos los recursos asociados.</p>
+                <p data-i18n="materias.seguroEliminar">¿Estás seguro de eliminar esta materia?</p>
+                <p class="text-danger"><strong data-i18n="materias.noDeshacer">Esta acción no se puede deshacer.</strong></p>
+                <p class="text-muted" data-i18n="materias.eliminarRecursos">Se eliminarán también todos los recursos asociados.</p>
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="cerrarModalDelete()">
+                <button type="button" class="btn-secondary" onclick="cerrarModalDelete()" data-i18n="materias.cancelar">
                     Cancelar
                 </button>
-                <button type="button" class="btn-danger" id="btnConfirmarDelete">
+                <button type="button" class="btn-danger" id="btnConfirmarDelete" data-i18n="materias.eliminar">
                     Eliminar
                 </button>
             </div>
@@ -220,6 +229,15 @@
 <script src="js/auth.js"></script>
 <!-- Admin Materias JS -->
 <script src="js/admin-materias.js"></script>
-
+<!-- i18n Module -->
+<script src="js/i18n.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar selector de idioma
+        if (typeof i18n !== 'undefined') {
+            i18n.crearSelectorIdioma();
+        }
+    });
+</script>
 </body>
 </html>

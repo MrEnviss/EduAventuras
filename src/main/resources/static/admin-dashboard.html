@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
     <link rel="stylesheet" href="css/admin-modal-usuarios.css">
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="data:,">
 </head>
 <body>
 
@@ -32,34 +34,24 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 <li class="nav-item">
-                    <a class="nav-link" href="home.html">Inicio</a>
+                    <a class="nav-link" href="home.html" data-i18n="navbar.inicio">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="materias.html">Materias</a>
+                    <a class="nav-link" href="materias.html" data-i18n="navbar.materias">Materias</a>
                 </li>
 
                 <li class="nav-item nav-authenticated" style="display: none;">
                     <span class="navbar-text" id="navbarUserName"></span>
                 </li>
+                <!-- Selector de idioma -->
                 <li class="nav-item">
-                    <div class="language-selector">
-                        <button class="btn-lang" id="btnLanguage">
-                            🌍 <span id="langLabel">ES</span>
-                        </button>
-                        <div class="lang-dropdown" id="langDropdown">
-                            <a href="#" data-lang="es">🇪🇸 Español</a>
-                            <a href="#" data-lang="en">🇺🇸 English</a>
-                            <a href="#" data-lang="fr">🇫🇷 Français</a>
-                        </div>
-                    </div>
+                    <div id="selector-idioma"></div>
                 </li>
                 <li class="nav-item nav-authenticated" style="display: none;">
-                    <button onclick="logout()" class="btn btn-outline-danger">
+                    <button onclick="logout()" class="btn btn-outline-danger" data-i18n="navbar.cerrarSesion">
                         Cerrar Sesión
                     </button>
                 </li>
-
-
             </ul>
         </div>
     </div>
@@ -70,14 +62,14 @@
 
     <!-- Header -->
     <div class="dashboard-header">
-        <h1>👋 Bienvenido, <span id="adminName">Administrador</span></h1>
-        <p>Panel de control y estadísticas de EduAventuras</p>
+        <h1><span data-i18n="admin.bienvenida">👋 Bienvenido</span>, <span id="adminName">Administrador</span></h1>
+        <p data-i18n="admin.panel">Panel de control y estadísticas de EduAventuras</p>
     </div>
 
     <!-- Loading State -->
     <div id="loadingDashboard" class="loading-dashboard">
         <div class="spinner"></div>
-        <p class="mt-3">Cargando estadísticas...</p>
+        <p class="mt-3" data-i18n="admin.cargando">Cargando estadísticas...</p>
     </div>
 
     <!-- Dashboard Content -->
@@ -88,46 +80,46 @@
             <div class="stat-card">
                 <div class="stat-icon usuarios">👥</div>
                 <div class="stat-value" id="totalUsuarios">0</div>
-                <div class="stat-label">Usuarios Registrados</div>
+                <div class="stat-label" data-i18n="admin.usuarios">Usuarios Registrados</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon materias">📚</div>
                 <div class="stat-value" id="totalMaterias">0</div>
-                <div class="stat-label">Materias Disponibles</div>
+                <div class="stat-label" data-i18n="admin.materias">Materias Disponibles</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon recursos">📄</div>
                 <div class="stat-value" id="totalRecursos">0</div>
-                <div class="stat-label">Recursos Subidos</div>
+                <div class="stat-label" data-i18n="admin.recursos">Recursos Subidos</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon descargas">⬇️</div>
                 <div class="stat-value" id="totalDescargas">0</div>
-                <div class="stat-label">Descargas Totales</div>
+                <div class="stat-label" data-i18n="admin.descargas">Descargas Totales</div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <h3 class="mb-3" style="color: var(--primary);">🚀 Acciones Rápidas</h3>
+        <h3 class="mb-3" style="color: var(--primary);" data-i18n="admin.acciones">🚀 Acciones Rápidas</h3>
         <div class="quick-actions">
             <a href="admin-materias.html" class="action-btn">
                 <span style="font-size: 1.5rem;">📚</span>
-                Gestionar Materias
+                <span data-i18n="admin.gestionarMaterias">Gestionar Materias</span>
             </a>
             <button onclick="abrirModalUsuarios()" class="action-btn" style="border: none; background: white;">
                 <span style="font-size: 1.5rem;">👥</span>
-                Gestionar Usuarios
+                <span data-i18n="admin.gestionarUsuarios">Gestionar Usuarios</span>
             </button>
             <a href="subir-recurso.html" class="action-btn">
                 <span style="font-size: 1.5rem;">⬆️</span>
-                Subir Recurso
+                <span data-i18n="subir.titulo">Subir Recurso</span>
             </a>
             <button onclick="descargarReporte()" class="action-btn" style="border: none; background: white;">
                 <span style="font-size: 1.5rem;">📊</span>
-                Ver Reportes
+                <span data-i18n="admin.reportes">Ver Reportes</span>
             </button>
         </div>
 
@@ -135,14 +127,14 @@
         <div class="row">
             <div class="col-lg-6 mb-4">
                 <div class="chart-container">
-                    <h3>📊 Usuarios por Rol</h3>
+                    <h3 data-i18n="admin.usuariosPorRol">📊 Usuarios por Rol</h3>
                     <canvas id="usuariosChart"></canvas>
                 </div>
             </div>
 
             <div class="col-lg-6 mb-4">
                 <div class="chart-container">
-                    <h3>📈 Recursos por Materia</h3>
+                    <h3 data-i18n="admin.recursosPorMateria">📈 Recursos por Materia</h3>
                     <canvas id="recursosChart"></canvas>
                 </div>
             </div>
@@ -150,7 +142,7 @@
 
         <!-- Recent Activity -->
         <div class="recent-activity">
-            <h3 class="mb-3" style="color: var(--primary);">🕒 Actividad Reciente</h3>
+            <h3 class="mb-3" style="color: var(--primary);" data-i18n="admin.actividadReciente">🕒 Actividad Reciente</h3>
             <div id="activityList">
                 <!-- Se llena dinámicamente -->
             </div>
@@ -163,7 +155,7 @@
 <div id="usuariosModal" class="usuarios-modal">
     <div class="modal-content-usuarios">
         <div class="modal-header-custom">
-            <h2>👥 Gestión de Usuarios</h2>
+            <h2 data-i18n="admin.gestionarUsuarios">👥 Gestión de Usuarios</h2>
             <button class="btn-close-modal" onclick="cerrarModalUsuarios()">&times;</button>
         </div>
 
@@ -171,6 +163,7 @@
         <div class="search-box">
             <input type="text"
                    id="searchUsuarios"
+                   data-i18n="placeholder:admin.buscarUsuarios"
                    placeholder="🔍 Buscar por nombre, email o rol..."
                    onkeyup="filtrarUsuarios()">
         </div>
@@ -178,7 +171,7 @@
         <!-- Loading -->
         <div id="loadingUsuarios" class="loading-usuarios" style="display: none;">
             <div class="spinner-modal"></div>
-            <p>Cargando usuarios...</p>
+            <p data-i18n="admin.cargandoUsuarios">Cargando usuarios...</p>
         </div>
 
         <!-- Tabla de usuarios -->
@@ -186,12 +179,12 @@
             <table class="usuarios-table">
                 <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Fecha Registro</th>
-                    <th>Acciones</th>
+                    <th data-i18n="admin.nombre">Nombre</th>
+                    <th data-i18n="admin.email">Email</th>
+                    <th data-i18n="admin.rol">Rol</th>
+                    <th data-i18n="admin.estado">Estado</th>
+                    <th data-i18n="admin.fechaRegistro">Fecha Registro</th>
+                    <th data-i18n="admin.acciones">Acciones</th>
                 </tr>
                 </thead>
                 <tbody id="tablaUsuariosBody">
@@ -206,13 +199,13 @@
 <div id="confirmModal" class="usuarios-modal" style="align-items: center;">
     <div class="modal-content-usuarios" style="max-width: 500px;">
         <div class="modal-header-custom">
-            <h3 id="confirmTitle">Confirmar acción</h3>
+            <h3 id="confirmTitle" data-i18n="admin.confirmarAccion">Confirmar acción</h3>
             <button class="btn-close-modal" onclick="cerrarConfirmacion()">&times;</button>
         </div>
         <p id="confirmMessage" style="margin: 1.5rem 0; color: #666;"></p>
         <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-            <button onclick="cerrarConfirmacion()" class="btn btn-secondary">Cancelar</button>
-            <button id="btnConfirmarAccion" class="btn btn-danger">Confirmar</button>
+            <button onclick="cerrarConfirmacion()" class="btn btn-secondary" data-i18n="admin.cancelar">Cancelar</button>
+            <button id="btnConfirmarAccion" class="btn btn-danger" data-i18n="admin.confirmar">Confirmar</button>
         </div>
     </div>
 </div>
@@ -225,6 +218,15 @@
 <script src="js/admin-dashboard.js"></script>
 <!-- Usuarios Modal JS -->
 <script src="js/admin-usuarios-modal.js"></script>
-
+<!-- i18n Module -->
+<script src="js/i18n.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar selector de idioma
+        if (typeof i18n !== 'undefined') {
+            i18n.crearSelectorIdioma();
+        }
+    });
+</script>
 </body>
 </html>

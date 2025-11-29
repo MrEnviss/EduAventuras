@@ -14,6 +14,8 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/i18n.css">
+
     <link rel="icon" href="data:,">
 
 </head>
@@ -22,33 +24,39 @@
 <div class="auth-container">
     <div class="container-fluid">
         <div class="row min-vh-100">
-
+            <li class="nav-item">
+                <div id="selector-idioma"></div>
+            </li>
             <!-- ===== COLUMNA IZQUIERDA: ILUSTRACIÓN ===== -->
             <div class="col-lg-6 auth-image-section d-none d-lg-flex">
                 <div class="auth-image-content">
                     <a href="home.html" class="logo-link">
+
                     </a>
                     <img src="assets/images/subjects/card-matematicas.png" alt="Estudiante" class="auth-illustration">
-                    <h2 class="auth-image-title">¡Únete a EduAventuras!</h2>
-                    <p class="auth-image-subtitle">Comienza tu viaje educativo hoy</p>
+                    <h2 class="auth-image-title" data-i18n="registro.unete">¡Únete a EduAventuras!</h2>
+                    <p class="auth-image-subtitle" data-i18n="registro.comienza">Comienza tu viaje educativo hoy</p>
+
                 </div>
             </div>
 
             <!-- ===== COLUMNA DERECHA: FORMULARIO ===== -->
             <div class="col-lg-6 auth-form-section">
                 <div class="auth-form-content">
+                    <!-- Selector de idioma -->
 
                     <!-- Logo para móvil -->
                     <div class="text-center d-lg-none mb-4">
                         <a href="home.html">
                             <img src="assets/images/Logo-Eduaventuras.svg" alt="EduAventuras" class="auth-logo-mobile">
                         </a>
+
                     </div>
 
                     <!-- Título -->
                     <div class="auth-header">
-                        <h1>Crear Cuenta</h1>
-                        <p>Completa el formulario para registrarte</p>
+                        <h1 data-i18n="registro.titulo">Crear Cuenta</h1>
+                        <p data-i18n="registro.descripcion">Completa el formulario para registrarte</p>
                     </div>
 
                     <!-- Alertas -->
@@ -63,18 +71,19 @@
                                 <div class="form-group">
                                     <label for="nombre" class="form-label">
                                         <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
-                                        Nombre
+                                        <span data-i18n="registro.nombre">Nombre</span>
                                     </label>
                                     <input
                                             type="text"
                                             class="form-control"
                                             id="nombre"
                                             name="nombre"
+                                            data-i18n="placeholder:registro.nombrePlaceholder"
                                             placeholder="Juan"
                                             required
                                             minlength="2"
                                             autocomplete="given-name">
-                                    <div class="invalid-feedback">
+                                    <div class="invalid-feedback" data-i18n="registro.nombreRequerido">
                                         El nombre es obligatorio
                                     </div>
                                 </div>
@@ -85,18 +94,19 @@
                                 <div class="form-group">
                                     <label for="apellido" class="form-label">
                                         <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
-                                        Apellido
+                                        <span data-i18n="registro.apellido">Apellido</span>
                                     </label>
                                     <input
                                             type="text"
                                             class="form-control"
                                             id="apellido"
                                             name="apellido"
+                                            data-i18n="placeholder:registro.apellidoPlaceholder"
                                             placeholder="Pérez"
                                             required
                                             minlength="2"
                                             autocomplete="family-name">
-                                    <div class="invalid-feedback">
+                                    <div class="invalid-feedback" data-i18n="registro.apellidoRequerido">
                                         El apellido es obligatorio
                                     </div>
                                 </div>
@@ -107,17 +117,18 @@
                         <div class="form-group">
                             <label for="email" class="form-label">
                                 <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
-                                Correo Electrónico
+                                <span data-i18n="registro.email">Correo Electrónico</span>
                             </label>
                             <input
                                     type="email"
                                     class="form-control"
                                     id="email"
                                     name="email"
+                                    data-i18n="placeholder:registro.emailPlaceholder"
                                     placeholder="ejemplo@correo.com"
                                     required
                                     autocomplete="email">
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" data-i18n="registro.emailValido">
                                 Ingresa un correo válido
                             </div>
                         </div>
@@ -126,7 +137,7 @@
                         <div class="form-group">
                             <label for="password" class="form-label">
                                 <img src="assets/images/icons/candado.png" alt="" class="icon-label">
-                                Contraseña
+                                <span data-i18n="registro.password">Contraseña</span>
                             </label>
                             <div class="password-input-wrapper">
                                 <input
@@ -134,6 +145,7 @@
                                         class="form-control"
                                         id="password"
                                         name="password"
+                                        data-i18n="placeholder:registro.passwordPlaceholder"
                                         placeholder="Mínimo 6 caracteres"
                                         required
                                         minlength="6"
@@ -142,7 +154,7 @@
                                     <span id="eyeIcon">👁️</span>
                                 </button>
                             </div>
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" data-i18n="registro.passwordMinimo">
                                 La contraseña debe tener al menos 6 caracteres
                             </div>
                         </div>
@@ -151,7 +163,7 @@
                         <div class="form-group">
                             <label for="confirmPassword" class="form-label">
                                 <img src="assets/images/icons/candado.png" alt="" class="icon-label">
-                                Confirmar Contraseña
+                                <span data-i18n="registro.confirmar">Confirmar Contraseña</span>
                             </label>
                             <div class="password-input-wrapper">
                                 <input
@@ -159,6 +171,7 @@
                                         class="form-control"
                                         id="confirmPassword"
                                         name="confirmPassword"
+                                        data-i18n="placeholder:registro.confirmarPlaceholder"
                                         placeholder="Repite tu contraseña"
                                         required
                                         autocomplete="new-password">
@@ -166,7 +179,7 @@
                                     <span id="eyeIcon2">👁️</span>
                                 </button>
                             </div>
-                            <div class="invalid-feedback" id="passwordMatchError">
+                            <div class="invalid-feedback" id="passwordMatchError" data-i18n="registro.noCoinciden">
                                 Las contraseñas no coinciden
                             </div>
                         </div>
@@ -174,14 +187,14 @@
                         <!-- Rol -->
                         <div class="form-group">
                             <label for="rol" class="form-label">
-                                👤 Tipo de Usuario
+                                <span data-i18n="registro.rol">👤 Tipo de Usuario</span>
                             </label>
                             <select class="form-control" id="rol" name="rol" required>
-                                <option value="">Selecciona tu rol</option>
-                                <option value="ESTUDIANTE">Estudiante</option>
-                                <option value="DOCENTE">Docente</option>
+                                <option value="" data-i18n="registro.seleccionaRol">Selecciona tu rol</option>
+                                <option value="ESTUDIANTE" data-i18n="registro.estudiante">Estudiante</option>
+                                <option value="DOCENTE" data-i18n="registro.docente">Docente</option>
                             </select>
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" data-i18n="registro.rolRequerido">
                                 Selecciona un tipo de usuario
                             </div>
                         </div>
@@ -190,16 +203,16 @@
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="terminos" required>
                             <label class="form-check-label" for="terminos">
-                                Acepto los <a href="#" class="text-decoration-none">términos y condiciones</a>
+                                <span data-i18n="registro.acepto">Acepto los</span> <a href="#" class="text-decoration-none" data-i18n="registro.terminos">términos y condiciones</a>
                             </label>
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" data-i18n="registro.aceptarTerminos">
                                 Debes aceptar los términos y condiciones
                             </div>
                         </div>
 
                         <!-- Botón de envío -->
                         <button type="submit" class="btn btn-primary btn-submit" id="btnRegistro">
-                            <span id="btnText">Crear Cuenta</span>
+                            <span id="btnText" data-i18n="registro.btn">Crear Cuenta</span>
                             <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
 
@@ -210,12 +223,12 @@
 
                         <!-- Link a login -->
                         <div class="auth-footer">
-                            <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+                            <p><span data-i18n="registro.yaTienesCuenta">¿Ya tienes una cuenta?</span> <a href="login.html" data-i18n="registro.iniciarSesion">Inicia sesión aquí</a></p>
                         </div>
 
                         <!-- Volver al inicio -->
                         <div class="text-center mt-3">
-                            <a href="home.html" class="back-to-home">
+                            <a href="home.html" class="back-to-home" data-i18n="registro.volverInicio">
                                 ← Volver al inicio
                             </a>
                         </div>
@@ -234,6 +247,15 @@
 
 <!-- Custom JavaScript -->
 <script src="js/registro.js"></script>
-
+<!-- i18n Module -->
+<script src="js/i18n.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar selector de idioma
+        if (typeof i18n !== 'undefined') {
+            i18n.crearSelectorIdioma();
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Explora todas las materias disponibles en EduAventuras">
@@ -15,7 +14,9 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-        <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/i18n.css">
+
+    <link rel="icon" href="data:,">
 
 </head>
 <body>
@@ -33,19 +34,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link" href="home.html">Inicio</a>
+                    <a class="nav-link" href="home.html" data-i18n="navbar.inicio">Inicio</a>
                 </li>
+                <!-- Selector de idioma -->
                 <li class="nav-item">
-                    <div class="language-selector">
-                        <button class="btn-lang" id="btnLanguage">
-                            🌍 <span id="langLabel">ES</span>
-                        </button>
-                        <div class="lang-dropdown" id="langDropdown">
-                            <a href="#" data-lang="es">🇪🇸 Español</a>
-                            <a href="#" data-lang="en">🇺🇸 English</a>
-                            <a href="#" data-lang="fr">🇫🇷 Français</a>
-                        </div>
-                    </div>
+                    <div id="selector-idioma"></div>
                 </li>
                 <!-- Los items de usuario se agregan dinámicamente -->
             </ul>
@@ -58,8 +51,8 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center">
-                <h1 class="page-title">Explora Nuestras Materias</h1>
-                <p class="page-subtitle">Encuentra recursos educativos de calidad en todas las áreas</p>
+                <h1 class="page-title" data-i18n="materias.explorar">Explora Nuestras Materias</h1>
+                <p class="page-subtitle" data-i18n="materias.encuentraRecursos">Encuentra recursos educativos de calidad en todas las áreas</p>
             </div>
         </div>
     </div>
@@ -77,6 +70,7 @@
                             type="text"
                             id="searchInput"
                             class="form-control search-input"
+                            data-i18n="placeholder:materias.buscarPlaceholder"
                             placeholder="🔍 Buscar materias (ej: Matemáticas, Ciencias...)">
                 </div>
             </div>
@@ -92,17 +86,17 @@
         <!-- Loading State -->
         <div id="loadingMaterias" class="text-center py-5">
             <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                <span class="visually-hidden">Cargando materias...</span>
+                <span class="visually-hidden" data-i18n="materias.cargando">Cargando materias...</span>
             </div>
-            <p class="mt-3">Cargando materias disponibles...</p>
+            <p class="mt-3" data-i18n="materias.cargandoDisponibles">Cargando materias disponibles...</p>
         </div>
 
         <!-- Error State -->
         <div id="errorMaterias" class="alert alert-danger d-none" role="alert">
-            <h4 class="alert-heading">⚠️ Error al cargar materias</h4>
-            <p>No se pudieron cargar las materias. Por favor, verifica que el servidor esté corriendo.</p>
+            <h4 class="alert-heading" data-i18n="materias.errorCargar">⚠️ Error al cargar materias</h4>
+            <p data-i18n="materias.errorMensaje">No se pudieron cargar las materias. Por favor, verifica que el servidor esté corriendo.</p>
             <hr>
-            <button class="btn btn-outline-danger" onclick="cargarMaterias()">
+            <button class="btn btn-outline-danger" onclick="cargarMaterias()" data-i18n="materias.reintentar">
                 🔄 Reintentar
             </button>
         </div>
@@ -113,8 +107,8 @@
                  alt="Sin materias"
                  class="empty-state-image mb-4"
                  style="max-width: 300px; opacity: 0.6;">
-            <h3>No hay materias disponibles</h3>
-            <p class="text-muted">Aún no se han agregado materias al sistema.</p>
+            <h3 data-i18n="materias.noDisponibles">No hay materias disponibles</h3>
+            <p class="text-muted" data-i18n="materias.noAgregadas">Aún no se han agregado materias al sistema.</p>
         </div>
 
         <!-- No results State -->
@@ -123,8 +117,8 @@
                  alt="Sin resultados"
                  class="empty-state-image mb-4"
                  style="max-width: 250px; opacity: 0.6;">
-            <h3>No se encontraron resultados</h3>
-            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+            <h3 data-i18n="materias.sinResultados">No se encontraron resultados</h3>
+            <p class="text-muted" data-i18n="materias.intentaOtros">Intenta con otros términos de búsqueda</p>
         </div>
 
         <!-- Grid de Materias -->
@@ -141,18 +135,18 @@
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-4">
                 <h5>EduAventuras</h5>
-                <p>Plataforma educativa gratuita dedicada a brindar recursos de calidad para estudiantes.</p>
+                <p data-i18n="footer.descripcion">Plataforma educativa gratuita dedicada a brindar recursos de calidad para estudiantes.</p>
             </div>
             <div class="col-lg-2 col-md-6 mb-4">
-                <h5>Enlaces</h5>
+                <h5 data-i18n="footer.enlaces">Enlaces</h5>
                 <ul>
-                    <li><a href="home.html">Inicio</a></li>
-                    <li><a href="materias.html">Materias</a></li>
-                    <li><a href="login.html">Iniciar Sesión</a></li>
+                    <li><a href="home.html" data-i18n="navbar.inicio">Inicio</a></li>
+                    <li><a href="materias.html" data-i18n="navbar.materias">Materias</a></li>
+                    <li><a href="login.html" data-i18n="navbar.iniciarSesion">Iniciar Sesión</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-md-6 mb-4">
-                <h5>Materias Populares</h5>
+                <h5 data-i18n="footer.materiasPopulares">Materias Populares</h5>
                 <ul>
                     <li><a href="#">Matemáticas</a></li>
                     <li><a href="#">Ciencias</a></li>
@@ -161,15 +155,15 @@
                 </ul>
             </div>
             <div class="col-lg-3 col-md-6 mb-4">
-                <h5>Contacto</h5>
+                <h5 data-i18n="footer.contacto">Contacto</h5>
                 <ul>
                     <li><a href="mailto:info@eduaventuras.com">info@eduaventuras.com</a></li>
-                    <li><a href="#">Soporte</a></li>
+                    <li><a href="#" data-i18n="footer.soporte">Soporte</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 EduAventuras. Todos los derechos reservados.</p>
+            <p data-i18n="footer.derechos">&copy; 2024 EduAventuras. Todos los derechos reservados.</p>
         </div>
     </div>
 </footer>
@@ -179,9 +173,17 @@
 
 <!-- Módulo de autenticación -->
 <script src="js/auth.js"></script>
-
+<!-- i18n Module -->
+<script src="js/i18n.js"></script>
 <!-- Script de esta página -->
 <script src="js/materias.js"></script>
-
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar selector de idioma
+        if (typeof i18n !== 'undefined') {
+            i18n.crearSelectorIdioma();
+        }
+    });
+</script>
 </body>
 </html>

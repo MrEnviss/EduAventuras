@@ -4,38 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Inicia sesión en EduAventuras">
-    <title>Iniciar Sesión - EduAventuras</title>
+    <title data-i18n="login.titulo">Iniciar Sesión - EduAventuras</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/auth.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
     <link rel="icon" href="data:,">
-
 </head>
 <body>
-<!-- ===== CONTAINER PRINCIPAL ===== -->
+
 <div class="auth-container">
     <div class="container-fluid">
         <div class="row min-vh-100">
 
-            <!-- ===== COLUMNA IZQUIERDA: ILUSTRACIÓN ===== -->
+            <!-- COLUMNA IZQUIERDA: ILUSTRACIÓN -->
             <div class="col-lg-6 auth-image-section d-none d-lg-flex">
                 <div class="auth-image-content">
-                    <a href="home.html" class="logo-link">
-
-                    </a>
+                    <a href="home.html" class="logo-link"></a>
                     <img src="assets/images/subjects/card-lenguajeliteratura.png" alt="Estudiante" class="auth-illustration">
-                    <h2 class="auth-image-title">¡Bienvenido de nuevo!</h2>
-                    <p class="auth-image-subtitle">Continúa tu aventura educativa</p>
+                    <h2 class="auth-image-title" data-i18n="login.bienvenida">¡Bienvenido de nuevo!</h2>
+                    <p class="auth-image-subtitle" data-i18n="login.continua">Continúa tu aventura educativa</p>
                 </div>
             </div>
 
-            <!-- ===== COLUMNA DERECHA: FORMULARIO ===== -->
+            <!-- COLUMNA DERECHA: FORMULARIO -->
             <div class="col-lg-6 auth-form-section">
                 <div class="auth-form-content">
 
@@ -48,8 +45,13 @@
 
                     <!-- Título -->
                     <div class="auth-header">
-                        <h1>Iniciar Sesión</h1>
-                        <p>Ingresa tus credenciales para acceder a tu cuenta</p>
+                        <h1 data-i18n="login.titulo">Iniciar Sesión</h1>
+                        <p data-i18n="login.descripcion">Ingresa tus credenciales para acceder a tu cuenta</p>
+                    </div>
+
+                    <!-- Selector de idioma -->
+                    <div class="mb-3 text-end">
+                        <div id="selector-idioma"></div>
                     </div>
 
                     <!-- Alertas -->
@@ -62,7 +64,7 @@
                         <div class="form-group">
                             <label for="email" class="form-label">
                                 <img src="assets/images/icons/usuario.png" alt="" class="icon-label">
-                                Correo Electrónico
+                                <span data-i18n="login.email">Correo Electrónico</span>
                             </label>
                             <input
                                     type="email"
@@ -81,7 +83,7 @@
                         <div class="form-group">
                             <label for="password" class="form-label">
                                 <img src="assets/images/icons/candado.png" alt="" class="icon-label">
-                                Contraseña
+                                <span data-i18n="login.password">Contraseña</span>
                             </label>
                             <div class="password-input-wrapper">
                                 <input
@@ -105,18 +107,18 @@
                         <div class="form-options">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">
+                                <label class="form-check-label" for="rememberMe" data-i18n="login.recordar">
                                     Recordarme
                                 </label>
                             </div>
-                            <a href="recuperar-password.html" class="forgot-password">
+                            <a href="recuperar-password.html" class="forgot-password" data-i18n="login.olvidaste">
                                 ¿Olvidaste tu contraseña?
                             </a>
                         </div>
 
                         <!-- Botón de envío -->
                         <button type="submit" class="btn btn-primary btn-submit" id="btnLogin">
-                            <span id="btnText">Iniciar Sesión</span>
+                            <span id="btnText" data-i18n="login.btn">Iniciar Sesión</span>
                             <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
 
@@ -127,12 +129,12 @@
 
                         <!-- Link a registro -->
                         <div class="auth-footer">
-                            <p>¿No tienes una cuenta? <a href="registro.html">Regístrate aquí</a></p>
+                            <p><span data-i18n="login.noCuenta">¿No tienes una cuenta?</span> <a href="registro.html" data-i18n="login.registrate">Regístrate aquí</a></p>
                         </div>
 
                         <!-- Volver al inicio -->
                         <div class="text-center mt-3">
-                            <a href="home.html" class="back-to-home">
+                            <a href="home.html" class="back-to-home" data-i18n="login.volver">
                                 ← Volver al inicio
                             </a>
                         </div>
@@ -148,11 +150,18 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Custom JavaScript -->
+<!-- i18n Module -->
 <script src="js/i18n.js"></script>
+<!-- Custom JavaScript -->
 <script src="js/login.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof i18n !== 'undefined') {
+            i18n.crearSelectorIdioma();
+        }
+    });
+</script>
 
 </body>
 </html>
